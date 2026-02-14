@@ -5,7 +5,7 @@
  * methods the game needs. All blockchain complexity stays here.
  */
 
-import { KKGameEngine, GameEvent } from '/finalTest/kktp/kkGameEngine.js';
+import { KKGameEngine, GameEvent } from '/slapjack/kktp/kkGameEngine.js';
 import { emit, AppEvent } from '../utils/events.js';
 
 /* ── Default credentials (auto-login, no password prompt) ── */
