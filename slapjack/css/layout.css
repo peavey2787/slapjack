@@ -1,0 +1,167 @@
+/* ═══════════════════════════════════════════════════════════
+   layout.css — Page scaffold, screen containers, grid
+   ═══════════════════════════════════════════════════════════ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  font-family: var(--font);
+  font-size: 16px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  overflow: hidden;
+  user-select: none;
+}
+
+.hidden { display: none !important; }
+
+/* ── App mount ── */
+.app {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Generic screen wrapper ── */
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-lg);
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity var(--dur-base) var(--ease-out),
+              transform var(--dur-base) var(--ease-out);
+  pointer-events: none;
+}
+
+.screen.active {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* ── HUD strip ── */
+.hud {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-sm) var(--sp-lg);
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(8px);
+  font-size: var(--fs-sm);
+  height: 48px;
+}
+
+.hud .balance {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-sm);
+  color: var(--gold);
+  font-weight: 600;
+}
+
+.hud .address-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-xs);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  padding: 4px 10px;
+  cursor: pointer;
+  font-size: var(--fs-xs);
+  font-family: var(--font-mono);
+  transition: border-color var(--dur-fast), color var(--dur-fast);
+}
+
+.hud .address-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.hud .address-btn.copied {
+  border-color: var(--success);
+  color: var(--success);
+}
+
+/* ── Loading overlay ── */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-primary);
+  gap: var(--sp-lg);
+  transition: opacity var(--dur-slow) var(--ease-out);
+}
+
+.loading-overlay.done {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.loading-text {
+  color: var(--text-secondary);
+  font-size: var(--fs-lg);
+}
+
+/* ── Toast container ── */
+.toast-container {
+  position: fixed;
+  bottom: var(--sp-lg);
+  right: var(--sp-lg);
+  z-index: 300;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--sp-sm);
+}
+
+/* ── Two-column layout (lobby) ── */
+.split-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: var(--sp-lg);
+  width: 100%;
+  max-width: 960px;
+  height: 100%;
+  max-height: 600px;
+}
+
+@media (max-width: 720px) {
+  .split-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto;
+    max-height: none;
+  }
+}
+
+/* ── Game table layout ── */
+.game-table {
+  position: relative;
+  width: 100%;
+  max-width: 700px;
+  aspect-ratio: 4 / 3;
+  margin: 0 auto;
+  background: radial-gradient(ellipse at center, var(--bg-card) 0%, var(--bg-surface) 100%);
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--border);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}

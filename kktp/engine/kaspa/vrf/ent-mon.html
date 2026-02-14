@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Entropy Monitor Demo</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2em; }
+    label { display: block; margin-top: 1em; }
+    input[type=text], textarea { width: 100%; font-family: monospace; margin-top: 0.2em; }
+    button { margin-top: 0.5em; }
+    .row { margin-bottom: 1.5em; }
+    #status { margin-top: 1em; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h2>Entropy Monitor Demo</h2>
+  <div class="row">
+    <label>QRNG (Editable)</label>
+    <textarea id="qrng" rows="2">00000000000000000000000000000000</textarea>
+  </div>
+  <div class="row">
+    <label>Bitcoin Block (Editable)</label>
+    <input type="text" id="btc" value="0000000000000000000000000000000000000000000000000000000000000000" />
+  </div>
+  <div class="row">
+    <label>Kaspa Block (Live)</label>
+    <input type="text" id="kas" readonly />
+    <button id="toggle">Start Monitoring</button>
+  </div>
+  <div class="row">
+    <label>Final Randomness (bits)</label>
+    <textarea id="final" rows="2" readonly></textarea>
+  </div>
+  <div class="row">
+    <label>NIST Results (last 10)</label>
+    <textarea id="nist" rows="6" readonly></textarea>
+  </div>
+  <div id="status"></div>
+  <script type="module">
+    import { getKaspaBlocks } from './core/fetcher/kaspa.js';
+    import { hexToBinary } from './core/crypto.js';
+    import core from './core/index.js';
+
+    let monitoring = false;
+    let intervalId = null;
+    let nistResults = [];
+    let failAlerted = false;
+
+    function getQrngBits() {
+      return document.getElementById('qrng').value.replace(/[^01]/g, '').padEnd(256, '0').slice(0, 256);
+    }
+    function getBtcBits() {
+      const val = document.getElementById('btc').value.trim();
+      // If it's a hex string, convert to binary
+      if (/^[0-9a-fA-F]{64}$/.test(val)) {
+        return hexToBinary(val);
+      }
+      // Otherwise, treat as binary
+      return val.replace(/[^01]/g, '').padEnd(256, '0').slice(0, 256);
+    }
+
+    document.getElementById('toggle').onclick = async () => {
+      monitoring = !monitoring;
+      document.getElementById('toggle').textContent = monitoring ? 'Stop Monitoring' : 'Start Monitoring';
+      document.getElementById('status').textContent = monitoring ? 'Monitoring entropy...' : '';
+      if (monitoring) {
+        failAlerted = false;
+        nistResults = [];
+        intervalId = setInterval(runTest, 10000);
+        await runTest();
+      } else {
+        clearInterval(intervalId);
+      }
+    };
+
+    async function runTest() {
+      try {
+        const kaspaBlocks = await getKaspaBlocks(1);
+        const kaspaBits = kaspaBlocks[0] ? hexToBinary(kaspaBlocks[0].hash) : '';
+        document.getElementById('kas').value = kaspaBlocks[0]?.hash || '';
+        // Fold all sources
+        let finalBits = '';
+        const qrngBits = getQrngBits();
+        const btcBits = getBtcBits();
+        if (qrngBits && btcBits && kaspaBits) {
+          const folded1 = await core.fold(qrngBits, btcBits);
+          finalBits = await core.fold(folded1, kaspaBits);
+        }
+        document.getElementById('final').value = finalBits;
+        // Run NIST tests
+        const nist = await core.fullNIST(finalBits);
+        nistResults.push(nist);
+        if (nistResults.length > 10) nistResults.shift();
+        // Count passing tests in last run
+        const lastPassCount = nist.filter(r => r.passed).length;
+        const lastTotal = nist.length;
+        // Show results
+        document.getElementById('nist').value = nistResults.map((res, i) => {
+          const passCount = res.filter(r => r.passed).length;
+          const total = res.length;
+          return `Test ${i+1}: ${passCount}/${total} passed`;
+        }).join('\n');
+        // If less than 50% pass, alert and stop
+        if (!failAlerted && lastPassCount / lastTotal < 0.5) {
+          failAlerted = true;
+          monitoring = false;
+          clearInterval(intervalId);
+          document.getElementById('toggle').textContent = 'Start Monitoring';
+          document.getElementById('status').textContent = 'Stopped: Entropy is not random!';
+          alert('Entropy is not random!');
+        }
+      } catch (err) {
+        document.getElementById('status').textContent = 'Error: ' + err.message;
+      }
+    }
+  </script>
+</body>
+</html>

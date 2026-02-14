@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>VRF Unit Test Dashboard</title>
+  <style>
+    body { background: #181818; color: #eee; font-family: monospace; padding: 20px; }
+    h2 { color: #00ff00; margin-bottom: 10px; }
+    .test-result { border: 1px solid #444; background: #222; margin-bottom: 18px; padding: 12px; border-radius: 6px; }
+    .passed { color: #00ff00; font-weight: bold; }
+    .failed { color: #ff4444; font-weight: bold; }
+    .test-name { color: #0af; font-weight: bold; }
+    .details { color: #aaa; font-size: 13px; margin-top: 8px; }
+    .btn { margin: 4px 8px 4px 0; padding: 6px 16px; background: #222; color: #eee; border: 1px solid #444; border-radius: 4px; cursor: pointer; }
+    .btn:hover { background: #333; }
+    #randomness { margin: 12px 0; padding: 8px; background: #222; border-radius: 6px; border: 1px solid #444; color: #0af; }
+  </style>
+</head>
+<body>
+  <h2>VRF Unit Test Dashboard</h2>
+  <div>
+    <button class="btn" id="runAllBtn">Run All Tests</button>
+    <button class="btn" id="fetchRandomBtn">Fetch Randomness</button>
+    <span id="randomness"></span>
+  </div>
+  <div id="testButtons"></div>
+  <div id="results"></div>
+  <script type="module">
+    const testFiles = [
+      { file: "./bitcoin.unit.test.js", label: "Bitcoin" },
+      { file: "./qrng.unit.test.js", label: "QRNG" },
+      { file: "./kaspa.unit.test.js", label: "Kaspa" },
+      { file: "./folding.unit.test.js", label: "Folding" },
+      { file: "./cache-persist.unit.test.js", label: "Cache Persist" }
+    ];
+
+    const resultsDiv = document.getElementById("results");
+    const testButtonsDiv = document.getElementById("testButtons");
+    const runAllBtn = document.getElementById("runAllBtn");
+    const fetchRandomBtn = document.getElementById("fetchRandomBtn");
+    const randomnessSpan = document.getElementById("randomness");
+
+    // Create individual test buttons
+    testFiles.forEach(({ file, label }) => {
+      const btn = document.createElement("button");
+      btn.className = "btn";
+      btn.textContent = `Run ${label} Test`;
+      btn.onclick = () => runSingleTest(file, label);
+      testButtonsDiv.appendChild(btn);
+    });
+
+    // Run all tests
+    runAllBtn.onclick = async () => {
+      resultsDiv.innerHTML = "";
+      for (const { file, label } of testFiles) {
+        await runSingleTest(file, label);
+      }
+    };
+
+    // Run a single test
+    async function runSingleTest(file, label) {
+      let result = { passed: false, details: "No result", name: file };
+      try {
+        const mod = await import(file + "?t=" + Date.now()); // cache-bust for dev
+        if (typeof mod.runTests === "function") {
+          result = await mod.runTests();
+        } else if (typeof mod.default === "function") {
+          result = await mod.default();
+        } else {
+          result.details = "No exported runTests function found.";
+        }
+      } catch (err) {
+        result.details = err.message || err.toString();
+      }
+      showResult(result, label);
+    }
+
+    // Show test result
+    function showResult(result, label) {
+      const div = document.createElement("div");
+      div.className = "test-result";
+      div.innerHTML = `
+        <span class="test-name">${label}</span><br>
+        <span class="${result.passed ? "passed" : "failed"}">
+          ${result.passed ? "PASSED" : "FAILED"}
+        </span>
+        <div class="details">${result.details || ""}</div>
+      `;
+      resultsDiv.appendChild(div);
+    }
+
+    // Fetch randomness (example: QRNG)
+    fetchRandomBtn.onclick = async () => {
+      randomnessSpan.textContent = "Fetching...";
+      try {
+        // Example: import QRNG fetcher and get 32 random bits
+        const { getQRNG } = await import("../fetcher/qrng.js");
+        const result = await getQRNG("nist", 32);
+        randomnessSpan.textContent = "QRNG: " + (result?.bits || JSON.stringify(result));
+      } catch (err) {
+        randomnessSpan.textContent = "Error: " + (err.message || err.toString());
+      }
+    };
+  </script>
+</body>
+</html>

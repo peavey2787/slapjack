@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>KKTP VRF Production Audit</title>
+    <style>
+      body {
+        font-family: "Courier New", monospace;
+        background: #0a0a0a;
+        color: #00ff00;
+        padding: 20px;
+        line-height: 1.2;
+      }
+      .panel {
+        border: 1px solid #00ff00;
+        padding: 15px;
+        background: #000;
+        margin-bottom: 20px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+      button {
+        background: #00ff00;
+        color: #000;
+        border: none;
+        padding: 12px 24px;
+        cursor: pointer;
+        font-weight: bold;
+        text-transform: uppercase;
+      }
+      button:disabled {
+        background: #222;
+        color: #444;
+      }
+      .data-box {
+        background: #111;
+        border: 1px solid #333;
+        padding: 10px;
+        font-size: 11px;
+        color: #888;
+        word-break: break-all;
+        white-space: normal;
+        margin-top: 5px;
+        margin-bottom: 10px;
+      }
+      .label {
+        color: #00ff00;
+        font-weight: bold;
+        font-size: 12px;
+        display: block;
+        margin-top: 10px;
+      }
+      .passed {
+        color: #00ff00;
+        font-weight: bold;
+      }
+      .failed {
+        color: #ff0000;
+        font-weight: bold;
+      }
+      hr {
+        border: 0;
+        border-top: 1px solid #333;
+        margin: 15px 0;
+      }
+      .field-tag {
+        color: #0af;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="panel">
+      <h2 style="margin: 0; padding-bottom: 10px">KKTP VRF PRODUCTION AUDIT</h2>
+      <button id="runGenerate">Execute Gen</button>
+      <button id="runVerify" disabled>Run Audit</button>
+    </div>
+
+    <div class="grid">
+      <div class="panel">
+        <h3>[1] PROVER OUTPUT (Evidence)</h3>
+        <div id="gen-status">Awaiting Execution...</div>
+        <div id="output-display"></div>
+      </div>
+
+      <div class="panel">
+        <h3>[2] VERIFIER AUDIT (Math)</h3>
+        <div id="audit-status">Awaiting Proof...</div>
+        <div id="audit-results"></div>
+      </div>
+    </div>
+
+    <script type="module">
+      import vrf from "../../vrfFacade.js";
+
+      const outputDisplay = document.getElementById("output-display");
+      const auditResults = document.getElementById("audit-results");
+      const verifyBtn = document.getElementById("runVerify");
+
+      let currentProof = null;
+      let foldedResult = null;
+
+      document.getElementById("runGenerate").onclick = async () => {
+        document.getElementById("gen-status").innerHTML = "Generating...";
+        try {
+          const result = await vrf.generateFoldedEntropy({
+            btcBlocks: 1,
+            kasBlocks: 1,
+            iterations: 2,
+          });
+          foldedResult = result;
+
+          // Ensure we handle cases where nist evidence might be an array or nested
+          currentProof = result.proof;
+          let n = currentProof.evidence.nist;
+          if (Array.isArray(n)) n = n[0];
+
+          // THE FULL RECONSTRUCTION PAYLOAD (NIST Spec 2.0)
+          const messageParts = [
+            "2.0",
+            "60000",
+            n.time,
+            n.seedValue,
+            n.previousOutputValue,
+            n.certificateId,
+            n.pulseIndex,
+          ];
+
+          const reconstructionString = messageParts.join("");
+
+          outputDisplay.innerHTML = `
+                <span class="label">FINAL ENTROPY</span>
+                <div class="data-box">${result.finalOutput}</div>
+                <hr>
+                <span class="label">NIST RECONSTRUCTION FIELDS</span>
+                <div class="data-box">
+                    <span class="field-tag">Version:</span> 2.0<br>
+                    <span class="field-tag">Freq:</span> 60000<br>
+                    <span class="field-tag">Time:</span> ${n.time}<br>
+                    <span class="field-tag">Seed:</span> ${n.seedValue}<br>
+                    <span class="field-tag">Prev:</span> ${n.previousOutputValue}<br>
+                    <span class="field-tag">CID:</span>  ${n.certificateId}<br>
+                    <span class="field-tag">Idx:</span>  ${n.pulseIndex}
+                </div>
+                <span class="label">FULL SIGNED STRING (HEX-CONCAT)</span>
+                <div class="data-box" style="color: #0af;">${reconstructionString}</div>
+                <span class="label">NIST RSA SIGNATURE</span>
+                <div class="data-box">${n.signature}</div>
+            `;
+
+          verifyBtn.disabled = false;
+          document.getElementById("gen-status").innerHTML = "<span class='passed'>READY</span>";
+        } catch (e) {
+          document.getElementById("gen-status").innerHTML = "<span class='failed'>GEN ERROR</span>";
+          console.error(e);
+        }
+      };
+
+      verifyBtn.onclick = async () => {
+        document.getElementById("audit-status").innerHTML = "Auditing...";
+        try {
+          // SCRAPE & REBUILD: Re-assembling the nist block to guarantee it isn't undefined
+          let nistSource = currentProof.evidence.nist;
+          if (Array.isArray(nistSource)) nistSource = nistSource[0];
+
+          const isValid = await vrf.verify(
+            foldedResult
+          );
+
+          document.getElementById("audit-status").innerHTML = isValid
+            ? "<span class='passed'>AUDIT PASSED ✓</span>"
+            : "<span class='failed'>AUDIT FAILED ✗</span>";
+
+          auditResults.innerHTML = `
+                <div class="data-box">
+                    <strong>Result:</strong> ${isValid ? "Cryptographically Valid" : "Signature Mismatch"}<br>
+                    <strong>Mechanism:</strong> RSA-SHA512 (NIST Beacon v2.0 Protocol)
+                </div>
+            `;
+        } catch (e) {
+          document.getElementById("audit-status").innerHTML = `<span class='failed'>ERROR: ${e.message}</span>`;
+          console.error("Audit Error Details:", e);
+        }
+      };
+    </script>
+  </body>
+</html>

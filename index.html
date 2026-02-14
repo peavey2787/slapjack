@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Slap Jack — Kaspa Blockchain</title>
+  <link rel="stylesheet" href="slapjack/css/variables.css" />
+  <link rel="stylesheet" href="slapjack/css/layout.css" />
+  <link rel="stylesheet" href="slapjack/css/components.css" />
+  <link rel="stylesheet" href="slapjack/css/cards.css" />
+  <link rel="stylesheet" href="slapjack/css/animations.css" />
+</head>
+<body>
+  <!-- Global HUD (wallet info) — always visible once initialized -->
+  <header id="hud" class="hud hidden"></header>
+
+  <!-- Toast container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Screen mount point — screens swap in/out here -->
+  <main id="app" class="app"></main>
+
+  <!-- Loading overlay -->
+  <div id="loading-overlay" class="loading-overlay">
+    <div class="loading-spinner"></div>
+    <p id="loading-text" class="loading-text">Connecting to Kaspa…</p>
+  </div>
+
+  <script type="module" src="slapjack/js/app.js"></script>
+</body>
+</html>

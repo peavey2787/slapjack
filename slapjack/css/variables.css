@@ -1,0 +1,66 @@
+/* ═══════════════════════════════════════════════════════════
+   variables.css — Design tokens & theme
+   ═══════════════════════════════════════════════════════════ */
+
+:root {
+  /* Surface palette — dark casino green */
+  --bg-primary:    #0a1a12;
+  --bg-secondary:  #0f2418;
+  --bg-surface:    #142e1f;
+  --bg-elevated:   #1a3a28;
+  --bg-card:       #1e4430;
+
+  /* Accent palette */
+  --accent:        #49d0a0;
+  --accent-glow:   rgba(73, 208, 160, .35);
+  --accent-dim:    #2a7a5e;
+  --gold:          #ffd700;
+  --gold-glow:     rgba(255, 215, 0, .30);
+
+  /* Suits */
+  --red-suit:      #e74c3c;
+  --black-suit:    #f0f0f0;
+
+  /* Text */
+  --text-primary:  #e8f5e9;
+  --text-secondary:#a5c4b5;
+  --text-muted:    #6a8f7d;
+  --text-inverse:  #0a1a12;
+
+  /* Feedback */
+  --success:       #27ae60;
+  --warning:       #f39c12;
+  --danger:        #e74c3c;
+
+  /* Borders & misc */
+  --border:        rgba(73, 208, 160, .15);
+  --border-strong: rgba(73, 208, 160, .35);
+  --shadow:        0 4px 24px rgba(0,0,0,.5);
+  --radius-sm:     6px;
+  --radius-md:     12px;
+  --radius-lg:     20px;
+
+  /* Spacing scale */
+  --sp-xs: 4px;
+  --sp-sm: 8px;
+  --sp-md: 16px;
+  --sp-lg: 24px;
+  --sp-xl: 40px;
+
+  /* Typography */
+  --font:       'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-mono:  'Cascadia Code', 'Fira Code', monospace;
+  --fs-xs:   .75rem;
+  --fs-sm:   .875rem;
+  --fs-base: 1rem;
+  --fs-lg:   1.25rem;
+  --fs-xl:   1.75rem;
+  --fs-2xl:  2.5rem;
+  --fs-3xl:  3.5rem;
+
+  /* Transitions */
+  --ease-out:  cubic-bezier(.22, 1, .36, 1);
+  --dur-fast:  150ms;
+  --dur-base:  300ms;
+  --dur-slow:  500ms;
+}

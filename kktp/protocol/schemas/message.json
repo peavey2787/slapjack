@@ -1,0 +1,64 @@
+{
+  "type": "object",
+
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": ["msg"],
+      "required": true
+    },
+
+    "version": {
+      "type": "number",
+      "required": true
+    },
+
+    "sid": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{32,}$",
+      "required": true
+    },
+
+    "mailbox_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]+$",
+      "required": true
+    },
+
+    "direction": {
+      "type": "string",
+      "enum": ["AtoB", "BtoA"],
+      "required": true
+    },
+
+    "seq": {
+      "type": "number",
+      "required": true
+    },
+
+    "nonce": {
+      "type": "string",
+      "pattern": "^[0-9a-f]+$",
+      "required": true
+    },
+
+    "ciphertext": {
+      "type": "string",
+      "pattern": "^[0-9a-f]+$",
+      "required": true
+    }
+  },
+
+  "required": [
+    "type",
+    "version",
+    "sid",
+    "mailbox_id",
+    "direction",
+    "seq",
+    "nonce",
+    "ciphertext"
+  ],
+
+  "additionalProperties": false
+}

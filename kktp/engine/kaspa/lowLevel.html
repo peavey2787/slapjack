@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Kaspa Low-Level Modules</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { background: #232223; color: #49eacb; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; }
+    .container { max-width: 700px; margin: 2.5rem auto; background: #2d292a; border-radius: 10px; box-shadow: 0 2px 16px #0008; padding: 2.5rem 2.5rem 2.5rem 2.5rem; }
+    h1 { color: #7fffd4; margin-bottom: 2.2rem; }
+    h2 { color: #7fffd4; margin-top: 2.2rem; margin-bottom: 1.2rem; }
+    ul.demos { list-style: none; padding: 0; margin-bottom: 2.2rem; }
+    ul.demos li { margin: 1.2em 0 1.2em 0; }
+    ul.demos a { color: #49eacb; font-weight: bold; text-decoration: none; font-size: 1.1em; }
+    ul.demos a:hover { text-decoration: underline; }
+    code, pre { background: #19191a; color: #7fffd4; border-radius: 4px; padding: 2px 6px; }
+    pre { padding: 1.2em 1em 1.2em 1em; overflow-x: auto; margin: 1.2em 0 1.7em 0; }
+    .section { margin-bottom: 3.2rem; }
+    ol { margin-bottom: 2.2rem; }
+    ol > li { margin-bottom: 2.1rem; }
+    ul { margin-bottom: 1.2rem; }
+    p { margin-bottom: 2.2rem; }
+    .params-box { background: #232223; border: 1px solid #49eacb44; border-radius: 8px; padding: 1rem 1rem; margin-top: 1rem; }
+    .params-title { color: #7fffd4; font-weight: bold; margin-bottom: 0.6rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🛠️ Low-Level Laboratory</h1>
+    <p style="background: #442222; padding: 1rem; border-radius: 8px; border: 1px solid #ff5555; color: #ffaaaa;">
+      <strong>Note:</strong> This page documents low-level modules for advanced debugging and custom tooling. For standard production usage, start with the <strong><a href="./index.html" style="color: #fff; text-decoration: underline;">KaspaPortal Facade</a></strong>.
+    </p>
+    <div class="section">
+      <h2>Client</h2>
+      <ol>
+        <li>
+          <strong>Connect to a Kaspa node:</strong>
+          <pre>
+import { connect } from './kktp/engine/kaspa/transport/kaspa_client.js';
+
+const client = await connect({ rpcUrl, networkId, onDisconnect });
+          </pre>
+          <div class="params-box">
+            <div class="params-title">Client Parameters</div>
+            <ul>
+              <li><code>rpcUrl</code> (<code>string</code> | <code>null</code>): Node ip:port (or <code>null</code> for resolver)</li>
+              <li><code>networkId</code> (<code>string</code>): e.g. <code>"mainnet"</code>, <code>"testnet-10"</code></li>
+              <li><code>onDisconnect</code> (<code>function</code>, optional): Optional callback for disconnect events</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+    </div>
+    <div class="section">
+      <h2>Wallet Management</h2>
+      <ol>
+        <li>
+          <strong>Initialize the wallet:</strong>
+          <pre>
+import { init } from './kktp/engine/kaspa/identity/wallet_service.js';
+
+init({ rpcClient: client, networkId, balanceElementId, onBalanceChange });
+          </pre>
+          <div class="params-box">
+            <div class="params-title">Wallet Init Parameters</div>
+            <ul>
+              <li><code>rpcClient</code> (<code>object</code>): The connected Kaspa client</li>
+              <li><code>networkId</code> (<code>string</code>): Network string</li>
+              <li><code>balanceElementId</code> (<code>string</code>, optional): DOM element ID to update balance</li>
+              <li><code>onBalanceChange</code> (<code>function</code>, optional): callback for balance updates</li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <strong>Create/Import a wallet:</strong>
+          <pre>
+import { createWallet } from './kktp/engine/kaspa/identity/wallet_service.js';
+
+const { mnemonic, address } = await createWallet({
+  password,             // Wallet password
+  walletFilename,       // (optional) Wallet filename
+  userHint,             // (optional) User hint for wallet
+  mnemonic,             // (optional) Import mnemonic
+  storeMnemonic,        // (optional) Store mnemonic in storage
+  discoverAddresses     // (optional, default true) Scan for used addresses
+});
+          </pre>
+          <div class="params-box">
+            <div class="params-title">createWallet Parameters</div>
+            <ul>
+              <li><code>password</code> (<code>string</code>): Wallet password</li>
+              <li><code>walletFilename</code> (<code>string</code>, optional): Wallet filename</li>
+              <li><code>userHint</code> (<code>string</code>, optional): User hint for wallet</li>
+              <li><code>mnemonic</code> (<code>string</code>, optional): Import mnemonic</li>
+              <li><code>storeMnemonic</code> (<code>boolean</code>, optional): Store mnemonic in storage</li>
+              <li><code>discoverAddresses</code> (<code>boolean</code>, optional, default <code>true</code>): Scan for used addresses</li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <strong>Send Kaspa:</strong>
+          <pre>
+import { send } from './kktp/engine/kaspa/identity/wallet_service.js';
+
+await send({
+  amount,            // Amount in KAS
+  toAddress,         // Destination address
+  payload,           // (optional) Payload string
+  priorityFeeKas     // (optional) Extra priority fee in KAS
+});
+          </pre>
+          <div class="params-box">
+            <div class="params-title">send Parameters</div>
+            <ul>
+              <li><code>amount</code> (<code>number</code>): Amount in KAS</li>
+              <li><code>toAddress</code> (<code>string</code>): Destination address</li>
+              <li><code>payload</code> (<code>string</code>, optional): Payload string</li>
+              <li><code>priorityFeeKas</code> (<code>number</code>, optional): Extra priority fee in KAS</li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <strong>Other wallet functions:</strong>
+          <pre>
+import { getSpendableBalance, generateNewAddress, getPrivateKeys } from './kktp/engine/kaspa/identity/wallet_service.js';
+
+const balance = await getSpendableBalance();
+const address = await generateNewAddress(); // generateNewAddress(change = false)
+const keys = await getPrivateKeys({ keyCount: 5, changeKeyCount: 2 });
+          </pre>
+          <div class="params-box">
+            <div class="params-title">Wallet Utility Parameters</div>
+            <ul>
+              <li><code>generateNewAddress(change)</code>: <code>change</code> (<code>boolean</code>, optional, default <code>false</code>) - if true, generates a change address</li>
+              <li><code>getPrivateKeys({ keyCount, changeKeyCount })</code>: returns an array of private keys for manual signing</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+    </div>
+    <div class="section">
+      <h2>Wallet File Management</h2>
+      <ol>
+        <li>
+          <strong>Get a list of all wallets:</strong>
+          <pre>
+import { getAllWallets } from './kktp/engine/kaspa/identity/wallet_service.js';
+
+const wallets = await getAllWallets();
+// wallets: Array of { filename, title, ... }
+          </pre>
+          <div class="params-box">
+            <div class="params-title">getAllWallets Parameters</div>
+            <ul>
+              <li><code>getAllWallets()</code>: Returns array of wallet file info objects</li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <strong>Delete a wallet by filename:</strong>
+          <pre>
+import { deleteWalletData } from './kktp/engine/kaspa/identity/storage.js';
+
+await deleteWalletData(filename); // filename: string
+          </pre>
+          <div class="params-box">
+            <div class="params-title">deleteWalletData Parameters</div>
+            <ul>
+              <li><code>deleteWalletData(filename)</code>: Deletes wallet by filename from storage</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+    </div>
+    <div class="section">
+      <h2>Block Scanner</h2>
+      <ol>
+        <li>
+          <strong>Block Scanner usage:</strong>
+          <pre>
+import { KaspaBlockScanner, SearchMode } from './kktp/engine/kaspa/intelligence/scanner.js';
+import { MatchMode } from './kktp/engine/kaspa/intelligence/indexer.js';
+
+// The scanner owns an indexer at: scanner.indexer
+const scanner = new KaspaBlockScanner(client, {
+  prefixes: ['test'],             // optional search text prefixes
+  mode: SearchMode.INCLUDES,      // includes | startsWith | exact | endsWith
+  addresses: [],                  // optional list of addresses to watch
+  indexerOptions: {
+    ttlMinutes: 10,
+    flushInterval: 5000,
+    maxSize: 500,
+    matchMode: MatchMode.ALL,
+    onIndexerUpdate: (event) => {
+      // stream indexer updates into your UI
+      // NOTE: *-cached events are batched per flush: event.data is an array.
+      // In-memory events provide a single entry.
+    }
+  }
+});
+
+// Optional: enable indexing
+scanner.indexer.start();
+
+await scanner.start((block, matches) => {
+  // block: full block object
+  // matches: array of match objects found in this block
+});
+
+scanner.stop();
+scanner.indexer.stop();
+          </pre>
+          <div class="params-box">
+            <div class="params-title">Scanner Parameters</div>
+            <ul>
+              <li><code>new KaspaBlockScanner(client, options)</code>: (<code>constructor</code>) Creates a scanner instance.</li>
+              <li><code>client</code>: (<code>object</code>) Connected Kaspa RPC client (from <code>connect()</code>)</li>
+              <li><code>options.prefixes</code>: (<code>string|string[]</code>, optional) Prefix or list of prefixes to match in payloads (stored internally as hex)</li>
+              <li><code>options.mode</code>: (<code>SearchMode</code>) One of <code>SearchMode.INCLUDES</code> | <code>SearchMode.STARTS_WITH</code> | <code>SearchMode.EXACT</code> | <code>SearchMode.ENDS_WITH</code></li>
+              <li><code>options.addresses</code>: (<code>string[]</code>, optional) List of addresses to watch (checks tx inputs/outputs)</li>
+              <li><code>options.indexerOptions</code>: (<code>object</code>, optional) Options passed to the built-in indexer instance (<code>scanner.indexer</code>)</li>
+            </ul>
+
+            <div class="params-title" style="margin-top:1rem;">Indexer Options (via <code>indexerOptions</code>)</div>
+            <ul>
+              <li><code>ttlMinutes</code>: (<code>number</code> | <code>null</code>) TTL for cached items (minutes). <code>null</code> disables TTL eviction.</li>
+              <li><code>flushInterval</code>: (<code>number</code>) Flush interval in ms for persisting buffered entries to IndexedDB.</li>
+              <li><code>maxSize</code>: (<code>number</code> | <code>null</code>) Max number of entries per store (size-based eviction). <code>null</code> disables size eviction.</li>
+              <li><code>priorityTTL</code>: (<code>boolean</code>) If true, evict by TTL before size (else size before TTL).</li>
+              <li><code>matchMode</code>: (<code>MatchMode</code>) <code>MatchMode.ALL</code> | <code>TRANSACTIONS</code> | <code>MATCHING</code> | <code>BLOCKS</code> | <code>CUSTOM</code></li>
+              <li><code>indexAllTransactions</code>, <code>indexAllMatchingTransactions</code>, <code>indexAllBlocks</code>: (<code>boolean</code>) Used when <code>matchMode=CUSTOM</code></li>
+              <li><code>onIndexerUpdate(event)</code>: (<code>function</code>) UI callback for live updates (in-memory + cached + evictions)</li>
+            </ul>
+          </div>
+
+          <div class="params-box">
+            <div class="params-title">Scanner Runtime API</div>
+            <ul>
+              <li><code>scanner.start((block, matches) =&gt; {})</code>: Subscribes to new blocks and invokes callback per block.</li>
+              <li><code>matches</code>: Array of match objects for that block (payload/address matches).</li>
+              <li><code>scanner.stop()</code>: Unsubscribes and resets scanner search state.</li>
+              <li><code>scanner.indexer.start()</code>/<code>stop()</code>: Starts/stops background flush + eviction timers.</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <div class="section">
+      <h2>Indexer</h2>
+      <ol>
+        <li>
+          <strong>Indexer usage (standalone):</strong>
+          <pre>
+import { KaspaIndexer, MatchMode } from './kktp/engine/kaspa/intelligence/indexer.js';
+
+const indexer = new KaspaIndexer({
+  ttlMinutes: 10,
+  flushInterval: 5000,
+  maxSize: 500,
+  priorityTTL: true,
+  matchMode: MatchMode.ALL,
+  onIndexerUpdate: (event) => {
+    // event.type: transaction-in-memory | matching-transaction-in-memory | block-in-memory | ...
+    // event.data:
+    // - for *-in-memory: a single entry
+    // - for *-cached: an array of entries (batched per flush)
+    // - for evict: { key, reason, storeName }
+  }
+});
+
+await indexer.initDB();
+indexer.start();
+
+// later...
+const metrics = indexer.getMetrics();
+          </pre>
+          <div class="params-box">
+            <div class="params-title">Indexer Parameters</div>
+            <ul>
+              <li><code>new KaspaIndexer(options)</code>: (<code>constructor</code>) Creates an indexer instance.</li>
+              <li><code>ttlMinutes</code>: (<code>number</code> | <code>null</code>) TTL for cached items (minutes). <code>null</code> disables TTL eviction.</li>
+              <li><code>flushInterval</code>: (<code>number</code>) Flush interval in ms (how often buffers are flushed to IndexedDB).</li>
+              <li><code>maxSize</code>: (<code>number</code> | <code>null</code>) Max number of entries per store (size-based eviction). <code>null</code> disables size eviction.</li>
+              <li><code>batchThresholdRatio</code>: (<code>number</code>) Eviction batching threshold (fraction of store size before bulk-style TTL eviction triggers).</li>
+              <li><code>priorityTTL</code>: (<code>boolean</code>) If true, evict TTL before size (else size before TTL).</li>
+              <li><code>inMemoryMaxTxs</code>, <code>inMemoryMaxBlocks</code>: (<code>number</code>) In-memory buffering caps before triggering flush.</li>
+              <li><code>dbName</code>: (<code>string</code>) IndexedDB database name.</li>
+              <li><code>matchMode</code>: (<code>MatchMode</code>) <code>MatchMode.ALL</code> | <code>TRANSACTIONS</code> | <code>MATCHING</code> | <code>BLOCKS</code> | <code>CUSTOM</code></li>
+              <li><code>indexAllTransactions</code>, <code>indexAllMatchingTransactions</code>, <code>indexAllBlocks</code>: (<code>boolean</code>) Used when <code>matchMode=CUSTOM</code></li>
+              <li><code>onIndexerUpdate(event)</code>: (<code>function</code>) Called for in-memory adds, cached flushes, and evictions.</li>
+            </ul>
+          </div>
+
+          <div class="params-box">
+            <div class="params-title">Indexer Runtime API</div>
+            <ul>
+              <li><code>await initDB()</code>: Initializes IndexedDB stores.</li>
+              <li><code>start()</code>/<code>stop()</code>: Enables/disables background eviction + periodic flush.</li>
+              <li><code>getMetrics()</code>: (<code>object</code>) Returns counters for observability:</li>
+              <li><code>transactionsIndexed</code>: (<code>number</code>) Count of transactions indexed.</li>
+              <li><code>blocksIndexed</code>: (<code>number</code>) Count of blocks indexed.</li>
+              <li><code>evictions</code>: (<code>{ ttl: number, size: number }</code>) Eviction counters by reason.</li>
+              <li><code>cacheHits</code>: (<code>number</code>) Cache hit counter.</li>
+              <li><code>cacheMisses</code>: (<code>number</code>) Cache miss counter.</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <div class="section">
+      <h2>Walking the DAG</h2>
+      <ol>
+        <li>
+          <strong>Walk the DAG with prefix filtering:</strong>
+          <pre>
+import { walkDagRange } from './kktp/engine/kaspa/intelligence/dag_walk.js';
+
+await walkDagRange({
+  client,
+  startHash,
+  endHash: null,
+  prefixes: ['KKTP:'],
+  maxSeconds: 30,
+  minTimestamp: 0,
+  logFn: console.log,
+  onMatch: (tx, block) => {
+    console.log('Match:', tx?.txid || tx?.transactionId, block?.hash);
+    // return true to stop early
+    return false;
+  },
+});
+          </pre>
+          <div class="params-box">
+            <div class="params-title">walkDagRange Parameters</div>
+            <ul>
+              <li><code>client</code> (object): Connected Kaspa RPC client.</li>
+              <li><code>startHash</code> (string): 64-char block hash (hex) to start from.</li>
+              <li><code>endHash</code> (string|null): Optional end hash to stop at.</li>
+              <li><code>prefixes</code> (string[]): Payload prefixes to match (string or hex).</li>
+              <li><code>maxSeconds</code> (number): Time budget for the walk (default 30).</li>
+              <li><code>minTimestamp</code> (number): Optional unix seconds filter (blocks older than this are skipped).</li>
+              <li><code>logFn(msg)</code> (function): Optional logger callback.</li>
+              <li><code>onMatch(tx, block)</code> (function): Optional callback per match; return <code>true</code> to stop early.</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+    </div>
+    <div class="section">
+      <h2>RPC Commands</h2>
+      <ol>
+        <li>
+          <strong>Run arbitrary RPC commands:</strong>
+          <pre>
+import { runRpcCommand } from './kktp/engine/kaspa/transport/rpc_runner.js';
+
+const result = await runRpcCommand(client, '{"method":"getInfo","params":{}}');
+// client: connected Kaspa RPC client
+// cmdText: JSON string with { method, params }
+          </pre>
+          <div class="params-box">
+            <div class="params-title">runRpcCommand Parameters</div>
+            <ul>
+              <li><code>client</code>: connected Kaspa RPC client</li>
+              <li><code>cmdText</code>: JSON string with <code>{ method, params }</code></li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+    </div>
+    <div class="section">
+      <h2>Encryption</h2>
+      <ol>
+        <li>
+          <strong>Symmetric Encryption usage:</strong>
+          <pre>
+import { encryptMessage, decryptMessage } from './kktp/engine/kaspa/crypto/encryption.js';
+
+// Encrypt
+const encrypted = encryptMessage(plaintext, password); // plaintext: string, password: string
+
+// Decrypt
+const decrypted = decryptMessage(encrypted, password); // encrypted: object/string, password: string
+          </pre>
+          <div class="params-box">
+            <div class="params-title">Symmetric Encryption Parameters</div>
+            <ul>
+              <li><code>encryptMessage(plaintext, password)</code></li>
+              <li><code>plaintext</code>: (<code>string</code>) The message/data you want to encrypt (utf-8 string).</li>
+              <li><code>password</code>: (<code>string</code>) User-supplied secret used to derive the encryption key (treat like a passphrase; don’t log it).</li>
+
+              <li style="margin-top:0.6rem;"><code>decryptMessage(encrypted, password)</code></li>
+              <li><code>encrypted</code>: (<code>object</code> | <code>string</code>) The encrypted payload produced by <code>encryptMessage</code> (object or serialized string).</li>
+              <li><code>password</code>: (<code>string</code>) Must be the same password used to encrypt (otherwise decryption fails).</li>
+            </ul>
+          </div>
+          <div class="params-box">
+            <div class="params-title">Symmetric Encryption API</div>
+            <ul>
+              <li><code>encryptMessage(plaintext, password)</code>: Returns an encrypted payload (object/string) suitable for transport/storage.</li>
+              <li><code>decryptMessage(encrypted, password)</code>: Returns the decrypted plaintext string.</li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <strong>Diffie–Hellman Encryption usage:</strong>
+          <pre>
+import { DHSession } from './kktp/engine/kaspa/crypto/dh_encryption.js';
+
+const dh = new DHSession();
+// Initiate handshake
+const handshakeMsg = dh.initiateHandshake(myPrivateKey, myPublicKey); // myPrivateKey: hex string, myPublicKey: hex string
+// Respond to handshake
+const response = await dh.respondToHandshake(peerPublicKeyHex); // peerPublicKeyHex: hex string
+// Encrypt
+const encrypted = dh.encrypt(message); // message: string
+// Decrypt
+const decrypted = dh.decrypt(encrypted); // encrypted: object/string
+          </pre>
+          <div class="params-box">
+            <div class="params-title">Diffie–Hellman Parameters</div>
+            <ul>
+              <li><code>initiateHandshake(myPrivateKey, myPublicKey)</code></li>
+              <li><code>myPrivateKey</code>: (<code>string</code>, hex) Your private key as a hex string (keep secret; never send to the peer).</li>
+              <li><code>myPublicKey</code>: (<code>string</code>, hex) Your public key as a hex string (safe to share; used by the peer to derive the shared secret).</li>
+
+              <li style="margin-top:0.6rem;"><code>respondToHandshake(peerPublicKeyHex)</code></li>
+              <li><code>peerPublicKeyHex</code>: (<code>string</code>, hex) The peer’s public key (hex string) received from their handshake message.</li>
+
+              <li style="margin-top:0.6rem;"><code>encrypt(message)</code></li>
+              <li><code>message</code>: (<code>string</code>) Plaintext string to encrypt after the handshake completes.</li>
+
+              <li style="margin-top:0.6rem;"><code>decrypt(encrypted)</code></li>
+              <li><code>encrypted</code>: (<code>object</code> | <code>string</code>) Encrypted payload produced by <code>encrypt()</code> on either side of the session.</li>
+            </ul>
+          </div>
+          <div class="params-box">
+            <div class="params-title">DHSession API</div>
+            <ul>
+              <li><code>new DHSession()</code>: Creates a session instance (maintains handshake state / derived key material).</li>
+              <li><code>initiateHandshake(myPrivateKey, myPublicKey)</code>: Creates the initial handshake message to send to your peer.</li>
+              <li><code>respondToHandshake(peerPublicKeyHex)</code>: Completes the handshake using the peer public key; returns a response message.</li>
+              <li><code>encrypt(message)</code>: Encrypts a plaintext message for the peer; returns encrypted payload (object/string).</li>
+              <li><code>decrypt(encrypted)</code>: Decrypts an encrypted payload from the peer; returns plaintext string.</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+    </div>
+    <div class="section">
+      <h2>Project Structure</h2>
+      <ul>
+        <li><strong>wrapper/</strong> — JS wrapper modules for Kaspa WASM</li>
+        <li><strong>demos/</strong> — Interactive demo HTML files</li>
+        <li><strong>kas-wasm/</strong> — Kaspa WASM SDK (place actual SDK here)</li>
+        <li><strong>styles.css</strong> — Shared stylesheet</li>
+      </ul>
+    </div>
+    <footer style="margin-top:2rem;text-align:center;color:#888;font-size:0.95em;">
+      &copy; 2026 Kaspa WASM Demo Suite
+    </footer>
+  </div>
+</body>
+</html>

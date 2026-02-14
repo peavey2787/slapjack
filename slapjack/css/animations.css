@@ -1,0 +1,103 @@
+/* ═══════════════════════════════════════════════════════════
+   animations.css — Keyframes & transitions
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Loading spinner ── */
+.loading-spinner {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Toast slide in ── */
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(40px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes toastOut {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(40px); }
+}
+
+/* ── Card deal ── */
+@keyframes dealCard {
+  0%   { opacity: 0; transform: translate(-50%, -180%) scale(.7) rotate(-8deg); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+}
+
+/* ── Card won (swept off) ── */
+@keyframes cardWon {
+  0%   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  60%  { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+  100% { opacity: 0; transform: translate(-50%, 60%) scale(.6); }
+}
+
+/* ── Slap flash ── */
+@keyframes slapFlash {
+  0%   { background: rgba(255,215,0,.3); }
+  50%  { background: rgba(255,215,0,.0); }
+  100% { background: rgba(255,215,0,.3); }
+}
+
+.slap-flash {
+  animation: slapFlash .25s ease-out 2;
+}
+
+/* ── Pulse (for slap button) ── */
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.05); }
+}
+
+.pulse { animation: pulse 1.5s ease-in-out infinite; }
+
+/* ── Fade in ── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.fade-in { animation: fadeIn var(--dur-base) var(--ease-out) forwards; }
+
+/* ── Slide up ── */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.slide-up { animation: slideUp var(--dur-base) var(--ease-out) forwards; }
+
+/* ── Shake (wrong slap) ── */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%      { transform: translateX(-8px); }
+  40%      { transform: translateX(8px); }
+  60%      { transform: translateX(-6px); }
+  80%      { transform: translateX(4px); }
+}
+
+.shake { animation: shake .4s ease-out; }
+
+/* ── Jack appear glow ── */
+@keyframes jackGlow {
+  0%   { box-shadow: 0 0 0 rgba(255,215,0,0); }
+  50%  { box-shadow: 0 0 30px rgba(255,215,0,.6), 0 0 60px rgba(255,215,0,.3); }
+  100% { box-shadow: 0 0 15px rgba(255,215,0,.3); }
+}
+
+.jack-glow {
+  animation: jackGlow .6s var(--ease-out) forwards;
+}
+
+/* ── Screen transitions ── */
+.screen-enter {
+  animation: slideUp var(--dur-base) var(--ease-out) forwards;
+}

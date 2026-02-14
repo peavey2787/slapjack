@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Randomness Fetcher Demo</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 2em;
+      }
+      label {
+        display: block;
+        margin-top: 1em;
+      }
+      input[type="text"],
+      textarea {
+        width: 100%;
+        font-family: monospace;
+        margin-top: 0.2em;
+      }
+      button {
+        margin-top: 0.5em;
+      }
+      .row {
+        margin-bottom: 1.5em;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Randomness Fetcher Demo</h2>
+    <div class="row">
+      <label>QRNG (NIST) <button id="fetch-qrng">Fetch QRNG</button></label>
+      <textarea id="qrng" rows="2" readonly></textarea>
+    </div>
+    <div class="row">
+      <label>Bitcoin Block <button id="fetch-btc">Fetch BTC</button></label>
+      <input type="text" id="btc" readonly />
+    </div>
+    <div class="row">
+      <label>Kaspa Block <button id="fetch-kas">Fetch Kaspa</button></label>
+      <input type="text" id="kas" readonly />
+    </div>
+    <div class="row">
+      <button id="fold">Fold All Together</button>
+      <label>Final Randomness</label>
+      <textarea id="final" rows="2" readonly></textarea>
+    </div>
+    <script type="module">
+      import { getQRNG } from "./qrng.js";
+      import { getBitcoinBlocks } from "./bitcoin.js";
+      import { getKaspaBlocks } from "./kaspa.js";
+      import { hexToBinary } from "../crypto.js";
+      import * as core from "./index.js";
+      import { sha256Hash } from "../crypto.js";
+      import { kaspaPortal } from "../../../kaspaPortal.js";
+
+      await kaspaPortal.init();
+      await kaspaPortal.connect({
+        networkId: "testnet-10",
+        startIntelligence: true,
+      });
+      await kaspaPortal.initVRF();
+
+      document.getElementById("fetch-qrng").onclick = async () => {
+        const qrng = await getQRNG();
+        console.log("QRNG bytes:", qrng);
+        const bytes = [];
+        for (let i = 0; i < qrng.hash.length; i += 2) {
+          bytes.push(parseInt(qrng.hash.substr(i, 2), 16));
+        }
+        document.getElementById("qrng").value = bytes
+          .map((b) => b.toString(16).padStart(2, "0"))
+          .join(" ");
+      };
+      document.getElementById("fetch-btc").onclick = async () => {
+        const blocks = await getBitcoinBlocks(1);
+        document.getElementById("btc").value = blocks[0]?.hash || "";
+      };
+      document.getElementById("fetch-kas").onclick = async () => {
+        const blocks = await getKaspaBlocks(1);
+        document.getElementById("kas").value = blocks[0]?.hash || "";
+      };
+      document.getElementById("fold").onclick = async () => {
+        // Use the core API for folding
+        const qrng = await getQRNG();
+        const btcBlocks = await getBitcoinBlocks(1);
+        const kaspaBlocks = await getKaspaBlocks(1);
+
+        // Convert QRNG hash to bits
+        const qrngBits = qrng.hash
+          .split("")
+          .map((h) => parseInt(h, 16).toString(2).padStart(4, "0"))
+          .join("");
+
+        const btcBits = btcBlocks[0] ? hexToBinary(btcBlocks[0].hash) : "";
+        const kaspaBits = kaspaBlocks[0]
+          ? hexToBinary(kaspaBlocks[0].hash)
+          : "";
+
+        let finalBits = "";
+        let finalHash = "";
+        if (qrngBits && btcBits && kaspaBits) {
+          const folded1 = await kaspaPortal.fold(qrngBits, btcBits);
+          finalBits = await kaspaPortal.fold(folded1, kaspaBits);
+          finalHash = await sha256Hash(finalBits);
+        }
+        document.getElementById("final").value =
+          `Bits:\n${finalBits}\n\nSHA-256:\n${finalHash}`;
+      };
+    </script>
+  </body>
+</html>

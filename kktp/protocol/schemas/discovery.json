@@ -1,0 +1,83 @@
+{
+  "type": "object",
+
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": ["discovery"],
+      "required": true
+    },
+
+    "version": {
+      "type": "number",
+      "required": true
+    },
+
+    "sid": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{32,}$",
+      "required": true
+    },
+
+    "pub_sig": {
+      "type": "string",
+      "pattern": "^[0-9a-f]+$",
+      "required": true
+    },
+
+    "pub_dh": {
+      "type": "string",
+      "pattern": "^[0-9a-f]+$",
+      "required": true
+    },
+
+    "vrf_value": {
+      "type": ["string", "null"]
+    },
+
+    "vrf_proof": {
+      "type": ["string", "null"]
+    },
+
+    "meta": {
+      "type": "object",
+      "required": true,
+      "properties": {
+        "game": {
+          "type": "string",
+          "required": true
+        },
+        "version": {
+          "type": "string",
+          "required": true
+        },
+        "expected_uptime_seconds": {
+          "type": "number",
+          "required": true
+        },
+        "lobby": {
+          "type": "boolean",
+          "description": "If true, this discovery represents a lobby/group session"
+        },
+        "lobby_name": {
+          "type": "string",
+          "description": "Human-readable lobby name (required if lobby=true)"
+        },
+        "max_members": {
+          "type": "number",
+          "description": "Maximum members allowed in lobby (required if lobby=true)"
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "sig": {
+      "type": "string",
+      "pattern": "^[0-9a-f]+$"
+    }
+  },
+
+  "required": ["type", "version", "sid", "pub_sig", "pub_dh", "meta", "sig"],
+
+  "additionalProperties": false
+}

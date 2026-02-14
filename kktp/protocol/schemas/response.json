@@ -1,0 +1,72 @@
+{
+  "type": "object",
+
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": ["response"],
+      "required": true
+    },
+
+    "version": {
+      "type": "number",
+      "required": true
+    },
+
+    "sid": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{32,}$",
+      "required": true
+    },
+
+    "initiator_pub_sig": {
+      "type": "string",
+      "pattern": "^[0-9a-f]+$",
+      "required": true
+    },
+
+    "initiator_pub_dh": {
+      "type": "string",
+      "pattern": "^[0-9a-f]+$",
+      "required": true
+    },
+
+    "pub_sig_resp": {
+      "type": "string",
+      "pattern": "^[0-9a-f]+$",
+      "required": true
+    },
+
+    "pub_dh_resp": {
+      "type": "string",
+      "pattern": "^[0-9a-f]+$",
+      "required": true
+    },
+
+    "vrf_value": {
+      "type": ["string", "null"]
+    },
+
+    "vrf_proof": {
+      "type": ["string", "null"]
+    },
+
+    "sig_resp": {
+      "type": "string",
+      "pattern": "^[0-9a-f]+$"
+    }
+  },
+
+  "required": [
+    "type",
+    "version",
+    "sid",
+    "initiator_pub_sig",
+    "initiator_pub_dh",
+    "pub_sig_resp",
+    "pub_dh_resp",
+    "sig_resp"
+  ],
+
+  "additionalProperties": false
+}

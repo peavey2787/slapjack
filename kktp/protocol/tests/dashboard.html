@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>KKTP Protocol Integration Test Dashboard</title>
+  <style>
+    body {
+      background: #181617;
+      color: #49eacb;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+    }
+    .dashboard-container {
+      margin: 2.5rem auto;
+      padding: 2rem 1.5rem;
+      background: #2d292a;
+      border-radius: 10px;
+      box-shadow: 0 2px 12px #00000044;
+      max-width: 540px;
+      text-align: center;
+    }
+    h1 {
+      color: #49eacb;
+      margin-bottom: 1.2em;
+      font-size: 2em;
+      letter-spacing: 1px;
+    }
+    .test-btns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.7em;
+      justify-content: center;
+      margin-bottom: 1.5em;
+    }
+    button {
+      background: #232223;
+      color: #49eacb;
+      border: 1.5px solid #49eacb;
+      border-radius: 5px;
+      padding: 0.6em 1.5em;
+      font-size: 1em;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+      margin: 0.2em 0.1em;
+    }
+    button:hover, button:focus {
+      background: #49eacb;
+      color: #232223;
+      border-color: #7fffd4;
+      outline: none;
+    }
+    .test-result {
+      margin: 0.7em 0 0.7em 0;
+      font-size: 1.08em;
+      border-radius: 4px;
+      padding: 0.5em 0.7em;
+      background: #232223;
+      border-left: 4px solid #49eacb;
+      text-align: left;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+      word-break: break-word;
+    }
+    .pass {
+      border-left-color: #27ae60;
+      color: #27ae60;
+    }
+    .fail {
+      border-left-color: #e74c3c;
+      color: #e74c3c;
+    }
+    #log-container {
+      background: #181617;
+      color: #d4d4d4;
+      padding: 12px 10px 12px 18px;
+      font-family: 'Fira Mono', 'Consolas', monospace;
+      height: 320px;
+      overflow-y: auto;
+      border-radius: 8px;
+      margin: 1.5em auto 0 auto;
+      max-width: 480px;
+      box-shadow: 0 2px 8px #00000033;
+      font-size: 1em;
+      border: 1.5px solid #232223;
+    }
+    .log-entry {
+      margin-bottom: 4px;
+      border-left: 3px solid #555;
+      padding-left: 8px;
+      font-size: 1em;
+    }
+    .test-summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      margin: 0.8rem auto 0 auto;
+      max-width: 480px;
+    }
+    .summary-item {
+      background: #232223;
+      border: 1.5px solid #49eacb;
+      border-radius: 999px;
+      padding: 0.25rem 0.7rem;
+      font-size: 0.85em;
+    }
+    .loading-overlay {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 0.8rem;
+      margin: 1rem auto 0 auto;
+      max-width: 480px;
+      background: #232223;
+      border: 1.5px solid #49eacb;
+      border-radius: 8px;
+      padding: 0.7rem 1rem;
+    }
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid #49eacb55;
+      border-top-color: #49eacb;
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+    }
+    .loading-text {
+      color: #49eacb;
+      font-size: 0.95em;
+      letter-spacing: 0.2px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .log-info {
+      color: #49eacb;
+    }
+    .log-crypto {
+      color: #ffb86c;
+      font-weight: bold;
+    }
+    .log-success {
+      color: #27ae60;
+    }
+    @media (max-width: 600px) {
+      .dashboard-container, #log-container, .test-result {
+        max-width: 98vw;
+        font-size: 0.98em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container">
+    <h1>KKTP Protocol Integration Test Dashboard</h1>
+    <div class="test-btns">
+      <button id="btn-run-all">Run All Integration Tests</button>
+      <button id="btn-test-1">Session Establishment</button>
+      <button id="btn-test-2">Message Send/Receive</button>
+      <button id="btn-test-3">Out-of-Order Delivery</button>
+      <button id="btn-test-4">Buffer Overflow/Adversarial</button>
+    </div>
+    <div id="loading" class="loading-overlay">
+      <div class="spinner"></div>
+      <div id="loading-text" class="loading-text">Getting ready...</div>
+    </div>
+    <div id="summary" class="test-summary"></div>
+    <div id="results"></div>
+    <div id="log-container"></div>
+  </div>
+  <script type="module">
+    import {
+      testSessionEstablishment,
+      testMessageSendReceive,
+      testOutOfOrderDelivery,
+      testAdversarialBufferOverflow,
+      runAllIntegrationTests,
+    } from "./integration.test.js";
+
+    const resultsDiv = document.getElementById("results");
+    const logContainer = document.getElementById("log-container");
+    const loading = document.getElementById("loading");
+    const loadingText = document.getElementById("loading-text");
+    const summary = document.getElementById("summary");
+
+    const testLabels = {
+      testSessionEstablishment: "Session Establishment",
+      testMessageSendReceive: "Message Send/Receive",
+      testOutOfOrderDelivery: "Out-of-Order Delivery",
+      testAdversarialBufferOverflow: "Buffer Overflow/Adversarial",
+    };
+    const summaryState = new Map();
+
+    function renderSummary() {
+      if (!summary) return;
+      if (summaryState.size === 0) {
+        summary.innerHTML = "";
+        return;
+      }
+      const items = Array.from(summaryState.entries())
+        .map(([name, status]) => {
+          const label = testLabels[name] || name;
+          const cls = status === "PASS" ? "pass" : "fail";
+          return `<span class="summary-item ${cls}">${label}: ${status}</span>`;
+        })
+        .join("");
+      summary.innerHTML = items;
+    }
+
+    const loadingPhrases = [
+      "Getting ready...",
+      "Warming up the DAG...",
+      "Connecting to Kaspa...",
+      "Deriving keys...",
+      "Verifying session...",
+      "Crunching crypto...",
+    ];
+    let loadingTimer = null;
+    let loadingIndex = 0;
+
+    function showLoading() {
+      if (!loading) return;
+      loading.style.display = "flex";
+      loadingIndex = 0;
+      if (loadingText) loadingText.textContent = loadingPhrases[loadingIndex];
+      if (loadingTimer) clearInterval(loadingTimer);
+      loadingTimer = setInterval(() => {
+        loadingIndex = (loadingIndex + 1) % loadingPhrases.length;
+        if (loadingText) loadingText.textContent = loadingPhrases[loadingIndex];
+      }, 1800);
+    }
+
+    function hideLoading() {
+      if (loadingTimer) clearInterval(loadingTimer);
+      loadingTimer = null;
+      if (loading) loading.style.display = "none";
+    }
+
+    function logToDashboard(message, type = 'info') {
+      const entry = document.createElement('div');
+      entry.className = `log-entry log-${type}`;
+      entry.textContent = message;
+      logContainer.appendChild(entry);
+      logContainer.scrollTop = logContainer.scrollHeight;
+    }
+
+    document.getElementById("btn-run-all").onclick = async () => {
+      resultsDiv.innerHTML += `<div>Running all integration tests...</div>`;
+      summaryState.clear();
+      renderSummary();
+      showLoading();
+      const results = await runAllIntegrationTests(logToDashboard);
+      hideLoading();
+      for (const r of results) {
+        summaryState.set(r.name, r.status);
+        renderSummary();
+        const errorText = r.error ? r.error.stack || r.error.toString() : "";
+        resultsDiv.innerHTML += `<div class='test-result ${r.status === "PASS" ? "pass" : "fail"}'>${r.name}: ${r.status}${errorText ? `<br><pre>${errorText}</pre>` : ""}</div>`;
+      }
+    };
+    document.getElementById("btn-test-1").onclick = async () => runSingle(testSessionEstablishment);
+    document.getElementById("btn-test-2").onclick = async () => runSingle(testMessageSendReceive);
+    document.getElementById("btn-test-3").onclick = async () => runSingle(testOutOfOrderDelivery);
+    document.getElementById("btn-test-4").onclick = async () => runSingle(testAdversarialBufferOverflow);
+
+    async function runSingle(fn) {
+      resultsDiv.innerHTML += `<div>Running <b>${fn.name}</b>...</div>`;
+      showLoading();
+      try {
+        await fn(logToDashboard);
+        hideLoading();
+        summaryState.set(fn.name, "PASS");
+        renderSummary();
+        resultsDiv.innerHTML += `<div class='test-result pass'>${fn.name}: PASS</div>`;
+      } catch (e) {
+        hideLoading();
+        summaryState.set(fn.name, "FAIL");
+        renderSummary();
+        const errorText = e?.stack || e?.toString() || String(e);
+        resultsDiv.innerHTML += `<div class='test-result fail'>${fn.name}: FAIL<br><pre>${errorText}</pre></div>`;
+      }
+    }
+  </script>
+</body>
+</html>

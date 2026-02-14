@@ -1,0 +1,1181 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kaspa Kinesis Game Engine</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+      body {
+        background: #0f1115;
+        color: #58f2d7;
+      }
+      .bg-surface {
+        background: #151924;
+        border: 1px solid #212636;
+      }
+      .text-muted-soft {
+        color: #7df6e6;
+      }
+      .badge-soft {
+        background: #1b2233;
+        border: 1px solid #2a3245;
+        color: #7df6e6;
+      }
+      .hero-card {
+        background: radial-gradient(
+          1200px circle at 10% 10%,
+          #1f2740 0%,
+          #151924 40%,
+          #121521 100%
+        );
+        border: 1px solid #2a3245;
+      }
+      a {
+        color: #76ffea;
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+        color: #9bfff1;
+      }
+      .code-panel {
+        background: #0b0e14;
+        border: 1px solid #222a3a;
+        color: #76ffea;
+      }
+      .navbar-brand,
+      .nav-link,
+      .nav-link:focus,
+      .nav-link:hover {
+        color: #76ffea !important;
+      }
+      .btn-primary,
+      .btn-outline-light {
+        background: #111826;
+        border-color: #2a3245;
+        color: #76ffea;
+      }
+      .btn-primary:hover,
+      .btn-outline-light:hover {
+        background: #0c121d;
+        border-color: #3a465f;
+        color: #9bfff1;
+      }
+      .event-desc {
+        color: #49eacb;
+        font-weight: 500;
+      }
+    </style>
+  </head>
+  <body>
+    <nav
+      class="navbar navbar-expand-lg navbar-dark bg-surface sticky-top border-bottom"
+    >
+      <div class="container py-2">
+        <a class="navbar-brand fw-semibold" href="./index.html">Kaspa Kinesis</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#kpNavbar"
+          aria-controls="kpNavbar"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="kpNavbar">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="#engine">KKGameEngine</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#facades">Advanced Facades</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container py-4 py-lg-5">
+      <header class="hero-card rounded-4 p-4 p-lg-5 mb-4">
+        <div class="row align-items-center g-4">
+          <div class="col-lg-7">
+            <h1 class="display-5 fw-semibold mb-3">Kaspa Kinesis Game Engine</h1>
+            <p class="lead text-muted-soft mb-4">
+              Developer‑first entry point for the game engine and Kaspa Portal.
+            </p>
+            <div class="d-flex flex-wrap gap-2">
+              <span class="badge rounded-pill badge-soft">Facade Pattern</span>
+              <span class="badge rounded-pill badge-soft"
+                >Singleton Orchestration</span
+              >
+              <span class="badge rounded-pill badge-soft">Protocol‑Ready</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <section class="mb-4" id="engine">
+        <div class="bg-surface rounded-4 p-4 p-lg-5">
+          <div
+            class="d-flex flex-column flex-lg-row align-items-start align-items-lg-center justify-content-between gap-3 mb-3"
+          >
+            <div>
+              <h2 class="h3 fw-semibold mb-2">
+                Global Entry Point: KKGameEngine
+              </h2>
+              <p class="text-muted-soft mb-0">
+                <strong>KKGameEngine</strong> is the primary API for gameplay,
+                anchoring, randomness, and lobbies.
+                <strong>kaspaPortal</strong> remains available for advanced,
+                low-level control.
+              </p>
+            </div>
+          </div>
+
+          <!-- Game States & Events Accordion -->
+          <div class="accordion mb-4" id="engineStatesEvents">
+            <div class="accordion-item bg-dark border border-secondary-subtle">
+              <h2 class="accordion-header" id="engineStates">
+                <button
+                  class="accordion-button collapsed bg-dark text-light"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#engineStatesBody"
+                  aria-expanded="false"
+                  aria-controls="engineStatesBody"
+                >
+                  Game States
+                </button>
+              </h2>
+              <div
+                id="engineStatesBody"
+                class="accordion-collapse collapse"
+                aria-labelledby="engineStates"
+                data-bs-parent="#engineStatesEvents"
+              >
+                <div class="accordion-body">
+                  <ul class="mb-0 text-light">
+                    <li>
+                      <strong>UNINITIALIZED</strong>:
+                      <span class="event-desc">Engine not yet initialized</span>
+                    </li>
+                    <li>
+                      <strong>INITIALIZING</strong>:
+                      <span class="event-desc">Engine is initializing</span>
+                    </li>
+                    <li>
+                      <strong>READY</strong>:
+                      <span class="event-desc">Ready for game start</span>
+                    </li>
+                    <li>
+                      <strong>IN_GAME</strong>:
+                      <span class="event-desc">Game session active</span>
+                    </li>
+                    <li>
+                      <strong>ENDING</strong>:
+                      <span class="event-desc">Game is ending</span>
+                    </li>
+                    <li>
+                      <strong>ERROR</strong>:
+                      <span class="event-desc">Error state</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item bg-dark border border-secondary-subtle">
+              <h2 class="accordion-header" id="engineEvents">
+                <button
+                  class="accordion-button collapsed bg-dark text-light"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#engineEventsBody"
+                  aria-expanded="false"
+                  aria-controls="engineEventsBody"
+                >
+                  Game Events
+                </button>
+              </h2>
+              <div
+                id="engineEventsBody"
+                class="accordion-collapse collapse"
+                aria-labelledby="engineEvents"
+                data-bs-parent="#engineStatesEvents"
+              >
+                <div class="accordion-body">
+                  <ul class="mb-0 text-light">
+                    <li>
+                      <strong>INITIALIZED</strong>:
+                      <span class="event-desc">Engine initialized</span>
+                    </li>
+                    <li>
+                      <strong>GAME_STARTED</strong>:
+                      <span class="event-desc">Game started</span>
+                    </li>
+                    <li>
+                      <strong>GAME_ENDED</strong>:
+                      <span class="event-desc">Game ended</span>
+                    </li>
+                    <li>
+                      <strong>GAME_READY</strong>:
+                      <span class="event-desc">Game and UTXO pool ready</span>
+                    </li>
+                    <li>
+                      <strong>POOL_LOW</strong>:
+                      <span class="event-desc">UTXO pool low</span>
+                    </li>
+                    <li>
+                      <strong>MOVE_RECORDED</strong>:
+                      <span class="event-desc">Move recorded</span>
+                    </li>
+                    <li>
+                      <strong>RANDOM_GENERATED</strong>:
+                      <span class="event-desc">Random number generated</span>
+                    </li>
+                    <li>
+                      <strong>BALANCE_CHANGED</strong>:
+                      <span class="event-desc">Wallet balance changed</span>
+                    </li>
+                    <li>
+                      <strong>LOW_FUNDS</strong>:
+                      <span class="event-desc">Low wallet funds</span>
+                    </li>
+                    <li>
+                      <strong>PLAYER_JOINED</strong>:
+                      <span class="event-desc">Player joined lobby</span>
+                    </li>
+                    <li>
+                      <strong>PLAYER_LEFT</strong>:
+                      <span class="event-desc">Player left lobby</span>
+                    </li>
+                    <li>
+                      <strong>MESSAGE_RECEIVED</strong>:
+                      <span class="event-desc">Lobby message received</span>
+                    </li>
+                    <li>
+                      <strong>CHAT_MESSAGE</strong>:
+                      <span class="event-desc">Chat message</span>
+                    </li>
+                    <li>
+                      <strong>LOBBY_UPDATED</strong>:
+                      <span class="event-desc">Lobby updated</span>
+                    </li>
+                    <li>
+                      <strong>LOBBY_CLOSED</strong>:
+                      <span class="event-desc">Lobby closed</span>
+                    </li>
+                    <li>
+                      <strong>GAME_START</strong>:
+                      <span class="event-desc">Game start signal</span>
+                    </li>
+                    <li>
+                      <strong>READY_STATE</strong>:
+                      <span class="event-desc">Ready state update</span>
+                    </li>
+                    <li>
+                      <strong>ANCHOR_SENT</strong>:
+                      <span class="event-desc">Anchor sent</span>
+                    </li>
+                    <li>
+                      <strong>ANCHOR_FAILED</strong>:
+                      <span class="event-desc">Anchor failed</span>
+                    </li>
+                    <li>
+                      <strong>OPPONENT_HEARTBEAT</strong>:
+                      <span class="event-desc">Opponent heartbeat</span>
+                    </li>
+                    <li>
+                      <strong>OPPONENT_MOVE_ANCHORED</strong>:
+                      <span class="event-desc">Opponent move anchored</span>
+                    </li>
+                    <li>
+                      <strong>ERROR</strong>:
+                      <span class="event-desc">Error event</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="accordion" id="engineExamples">
+            <div class="accordion-item bg-dark border border-secondary-subtle">
+              <h2 class="accordion-header" id="engineExampleOne">
+                <button
+                  class="accordion-button collapsed bg-dark text-light"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#engineExampleOneBody"
+                  aria-expanded="false"
+                  aria-controls="engineExampleOneBody"
+                >
+                  Quick start: init, start, end, shutdown
+                </button>
+              </h2>
+              <div
+                id="engineExampleOneBody"
+                class="accordion-collapse collapse"
+                aria-labelledby="engineExampleOne"
+                data-bs-parent="#engineExamples"
+              >
+                <div class="accordion-body">
+                  <pre class="code-panel rounded-3 p-3 mb-0">
+import { KKGameEngine } from './kktp/kkGameEngine.js';
+
+const game = new KKGameEngine();
+await game.init({
+  password: '1234',
+  walletName: 'demo_wallet',
+  network: 'testnet-10',
+  onBalanceChange: (balance) => console.log('Balance:', balance),
+});
+
+await game.startGame({ gameId: 'match-001', playerId: 'player-1' });
+const result = await game.endGame({ score: 42, coins: 3 });
+await game.shutdown();</pre
+                  >
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item bg-dark border border-secondary-subtle">
+              <h2 class="accordion-header" id="engineExampleTwo">
+                <button
+                  class="accordion-button collapsed bg-dark text-light"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#engineExampleTwoBody"
+                  aria-expanded="false"
+                  aria-controls="engineExampleTwoBody"
+                >
+                  Gameplay actions (moves, events, opponent validation)
+                </button>
+              </h2>
+              <div
+                id="engineExampleTwoBody"
+                class="accordion-collapse collapse"
+                aria-labelledby="engineExampleTwo"
+                data-bs-parent="#engineExamples"
+              >
+                <div class="accordion-body">
+                  <pre class="code-panel rounded-3 p-3 mb-0">
+const move = await game.recordMove('jump', { lane: 1 });
+const event = game.recordEvent('coin_collected', { lane: 1, value: 10 });
+
+// Listen for opponent moves (event-driven)
+game.on('opponentMoveAnchored', (move) => {
+  console.log('Opponent move:', move);
+  // Update your game state/UI here
+});
+
+// Listen for opponent heartbeats
+game.on('opponentHeartbeat', (heartbeat) => {
+  console.log('Opponent heartbeat:', heartbeat);
+});
+
+console.log({ move, event });</pre
+                  >
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item bg-dark border border-secondary-subtle">
+              <h2 class="accordion-header" id="engineExampleThree">
+                <button
+                  class="accordion-button collapsed bg-dark text-light"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#engineExampleThreeBody"
+                  aria-expanded="false"
+                  aria-controls="engineExampleThreeBody"
+                >
+                  Randomness + block stream
+                </button>
+              </h2>
+              <div
+                id="engineExampleThreeBody"
+                class="accordion-collapse collapse"
+                aria-labelledby="engineExampleThree"
+                data-bs-parent="#engineExamples"
+              >
+                <div class="accordion-body">
+                  <pre class="code-panel rounded-3 p-3 mb-3">
+const random = await game.getRandom({ seed: 'turn-5-attack' });
+const shuffled = await game.shuffle([1, 2, 3, 4]);
+console.log(random.value, random.number, shuffled);</pre
+                  >
+                  <pre class="code-panel rounded-3 p-3 mb-0">
+const onBlock = (block) => console.log('Block:', block.hash);
+game.onBlock(onBlock);
+const blocks = await game.getKaspaBlocks(2);
+game.offBlock(onBlock);
+console.log('Recent blocks:', blocks.length);</pre
+                  >
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item bg-dark border border-secondary-subtle">
+              <h2 class="accordion-header" id="engineExampleFour">
+                <button
+                  class="accordion-button collapsed bg-dark text-light"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#engineExampleFourBody"
+                  aria-expanded="false"
+                  aria-controls="engineExampleFourBody"
+                >
+                  Audit + proofs
+                </button>
+              </h2>
+              <div
+                id="engineExampleFourBody"
+                class="accordion-collapse collapse"
+                aria-labelledby="engineExampleFour"
+                data-bs-parent="#engineExamples"
+              >
+                <div class="accordion-body">
+                  <pre class="code-panel rounded-3 p-3 mb-3">
+const auditData = game.getAuditData();
+const verdict = await game.auditCheating(auditData);
+console.log('Audit verdict:', verdict.verdict);
+
+const parsed = game.parseAnchor(auditData.anchorChain?.chain?.[0]);
+console.log('Parsed anchor:', parsed);</pre
+                  >
+                  <pre class="code-panel rounded-3 p-3 mb-0">
+const merkleRoot = game.getMerkleRoot();
+const moves = game.getMoveHistory();
+const moveCount = game.getMoveCount();
+console.log({ merkleRoot, moveCount, moves });</pre
+                  >
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item bg-dark border border-secondary-subtle">
+              <h2 class="accordion-header" id="engineExampleFive">
+                <button
+                  class="accordion-button collapsed bg-dark text-light"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#engineExampleFiveBody"
+                  aria-expanded="false"
+                  aria-controls="engineExampleFiveBody"
+                >
+                  Multiplayer lobbies
+                </button>
+              </h2>
+              <div
+                id="engineExampleFiveBody"
+                class="accordion-collapse collapse"
+                aria-labelledby="engineExampleFive"
+                data-bs-parent="#engineExamples"
+              >
+                <div class="accordion-body">
+                  <pre class="code-panel rounded-3 p-3 mb-3">
+const lobby = await game.createLobby({ name: 'Demo Lobby', maxPlayers: 8 });
+await game.sendLobbyMessage('hello lobby');
+console.log('Join code:', lobby.joinCode);</pre
+                  >
+                  <pre class="code-panel rounded-3 p-3 mb-3">
+const joined = await game.joinLobby('JOINCODE123', 'DemoUser');
+console.log('Joined lobby:', joined.lobbyId);</pre
+                  >
+                  <pre class="code-panel rounded-3 p-3 mb-3">
+const lobbies = [];
+const unsubscribe = game.searchLobbies((lobby) => {
+  lobbies.push(lobby);
+  console.log('Discovered lobby:', lobby);
+});
+
+// Later, when you want to stop searching:
+unsubscribe();
+console.log('Total lobbies found:', lobbies.length);
+</pre
+                  >
+                  <pre class="code-panel rounded-3 p-3 mb-0">
+const members = game.getLobbyMembers();
+await game.leaveLobby('done');
+console.log('Members:', members);</pre
+                  >
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item bg-dark border border-secondary-subtle">
+              <h2 class="accordion-header" id="engineExampleSix">
+                <button
+                  class="accordion-button collapsed bg-dark text-light"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#engineExampleSixBody"
+                  aria-expanded="false"
+                  aria-controls="engineExampleSixBody"
+                >
+                  Wallet + UTXO runway
+                </button>
+              </h2>
+              <div
+                id="engineExampleSixBody"
+                class="accordion-collapse collapse"
+                aria-labelledby="engineExampleSix"
+                data-bs-parent="#engineExamples"
+              >
+                <div class="accordion-body">
+                  <p class="text-muted-soft small mb-3">
+                    On <strong>startGame</strong>, the engine calls
+                    <strong>prepareForGame</strong> which splits UTXOs to enable
+                    rapid anchoring and starts a heartbeat if needed to maintain
+                    runway. If you want to consolidate back to fewer UTXOs after
+                    play, call the advanced API on
+                    <strong>kaspaPortal</strong> directly.
+                  </p>
+                  <pre class="code-panel rounded-3 p-3 mb-3">
+console.log('Address:', game.address);
+console.log('Balance:', game.balance);
+console.log('Has funds:', game.hasSufficientFunds);
+const fresh = await game.getBalance();
+console.log('Fresh balance:', fresh);</pre
+                  >
+                  <pre class="code-panel rounded-3 p-3 mb-0">
+import { kaspaPortal } from './kktp/engine/kaspa/kaspaPortal.js';
+
+const keys = await kaspaPortal.getPrivateKeys();
+await kaspaPortal.consolidateUtxos({
+  address: kaspaPortal.address,
+  privateKeys: keys,
+  targetCount: 1,
+});</pre
+                  >
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item bg-dark border border-secondary-subtle">
+              <h2 class="accordion-header" id="engineExampleSeven">
+                <button
+                  class="accordion-button collapsed bg-dark text-light"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#engineExampleSevenBody"
+                  aria-expanded="false"
+                  aria-controls="engineExampleSevenBody"
+                >
+                  Events
+                </button>
+              </h2>
+              <div
+                id="engineExampleSevenBody"
+                class="accordion-collapse collapse"
+                aria-labelledby="engineExampleSeven"
+                data-bs-parent="#engineExamples"
+              >
+                <div class="accordion-body">
+                  <pre class="code-panel rounded-3 p-3 mb-0">
+import { GameEvent } from './kktp/kkGameEngine.js';
+
+game.on(GameEvent.MOVE_RECORDED, (move) => console.log('Move:', move));
+game.once(GameEvent.GAME_STARTED, () => console.log('Game started'));
+
+const handler = (data) => console.log('Balance:', data.balance);
+game.on(GameEvent.BALANCE_CHANGED, handler);
+game.off(GameEvent.BALANCE_CHANGED, handler);</pre
+                  >
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item bg-dark border border-secondary-subtle">
+              <h2 class="accordion-header" id="engineExampleEight">
+                <button
+                  class="accordion-button collapsed bg-dark text-light"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#engineExampleEightBody"
+                  aria-expanded="false"
+                  aria-controls="engineExampleEightBody"
+                >
+                  KKGameEngine logger
+                </button>
+              </h2>
+              <div
+                id="engineExampleEightBody"
+                class="accordion-collapse collapse"
+                aria-labelledby="engineExampleEight"
+                data-bs-parent="#engineExamples"
+              >
+                <div class="accordion-body">
+                  <p class="text-muted-soft small mb-3">
+                    Use the logger to enable or disable specific modules. Each
+                    module name is a dotted path you can filter on.
+                  </p>
+                  <pre class="code-panel rounded-3 p-3 mb-4">
+import { Logger, LogModule } from './kktp/core/logger.js';
+
+Logger.setEnabled(true);
+Logger.enableModule(LogModule.kktp.kkGameEngine);
+Logger.enableModule(LogModule.transport.root);
+Logger.disableModule(LogModule.transport.txBuilder);
+
+const log = Logger.create(LogModule.kktp.kkGameEngine);
+log.info('Engine initialized and ready.');</pre>
+                  <h3 class="h6 fw-semibold mb-3">All modules and sub-modules</h3>
+                  <div class="row g-3 small">
+                    <div class="col-lg-4">
+                      <ul class="mb-0 text-light">
+                        <li>
+                          <strong>core</strong>
+                          <ul class="text-light">
+                            <li>core</li>
+                            <li>core.eventEmitter</li>
+                          </ul>
+                        </li>
+                        <li>
+                          <strong>transport</strong>
+                          <ul class="text-light">
+                            <li>transport</li>
+                            <li>transport.heartbeat</li>
+                            <li>transport.kaspaClient</li>
+                            <li>transport.rpcRunner</li>
+                            <li>transport.transportFacade</li>
+                            <li>transport.txBuilder</li>
+                            <li>transport.utxoManager</li>
+                            <li>transport.utxoOperations</li>
+                          </ul>
+                        </li>
+                        <li>
+                          <strong>intelligence</strong>
+                          <ul class="text-light">
+                            <li>intelligence</li>
+                            <li>intelligence.dagWalk</li>
+                            <li>intelligence.indexer</li>
+                            <li>intelligence.intelligenceFacade</li>
+                            <li>intelligence.scanner</li>
+                          </ul>
+                        </li>
+                        <li>
+                          <strong>identity</strong>
+                          <ul class="text-light">
+                            <li>identity</li>
+                            <li>identity.identityFacade</li>
+                            <li>identity.storage</li>
+                            <li>identity.walletService</li>
+                          </ul>
+                        </li>
+                        <li>
+                          <strong>crypto</strong>
+                          <ul class="text-light">
+                            <li>crypto</li>
+                            <li>crypto.cryptoFacade</li>
+                            <li>crypto.dhEncryption</li>
+                            <li>crypto.encryption</li>
+                          </ul>
+                        </li>
+                      </ul>
+                    </div>
+                    <div class="col-lg-4">
+                      <ul class="mb-0 text-light">
+                        <li>
+                          <strong>kktp</strong>
+                          <ul class="text-light">
+                            <li>kktp</li>
+                            <li>kktp.kkGameEngine</li>
+                            <li>kktp.kaspaPortal</li>
+                          </ul>
+                        </li>
+                        <li>
+                          <strong>protocol</strong>
+                          <ul class="text-light">
+                            <li>protocol</li>
+                            <li>protocol.sessions</li>
+                            <li>protocol.sessions.sessionFacade</li>
+                            <li>protocol.sessions.sessionVault</li>
+                            <li>protocol.sessions.keyDeriver</li>
+                          </ul>
+                        </li>
+                        <li>
+                          <strong>lobby</strong>
+                          <ul class="text-light">
+                            <li>lobby</li>
+                            <li>lobby.lobbyManager</li>
+                            <li>lobby.lobbyMessageHandler</li>
+                            <li>lobby.index</li>
+                            <li>lobby.lobbyCodec</li>
+                            <li>lobby.lobbyFacade</li>
+                            <li>lobby.lobbySchemas</li>
+                            <li>lobby.parts</li>
+                            <li>lobby.parts.index</li>
+                            <li>lobby.parts.lobbyContext</li>
+                            <li>lobby.parts.lobbyDiscovery</li>
+                            <li>lobby.parts.lobbyDmBuffer</li>
+                            <li>lobby.parts.lobbyJoins</li>
+                            <li>lobby.parts.lobbyKeys</li>
+                            <li>lobby.parts.lobbyMessaging</li>
+                            <li>lobby.parts.lobbyPersistence</li>
+                            <li>lobby.parts.lobbyRoster</li>
+                            <li>lobby.parts.lobbyRouting</li>
+                            <li>lobby.parts.lobbySessionEnd</li>
+                            <li>lobby.parts.lobbySubscriptions</li>
+                            <li>lobby.parts.lobbyUtils</li>
+                            <li>lobby.parts.lobbyUtxo</li>
+                          </ul>
+                        </li>
+                        <li>
+                          <strong>anchor</strong>
+                          <ul class="text-light">
+                            <li>anchor</li>
+                            <li>anchor.anchorFinal</li>
+                            <li>anchor.anchorGenesis</li>
+                            <li>anchor.anchorHeartbeat</li>
+                            <li>anchor.auditTrail</li>
+                            <li>anchor.binaryPacking</li>
+                            <li>anchor.hashing</li>
+                            <li>anchor.kaspaAnchorFacade</li>
+                            <li>anchor.moveProcessor</li>
+                            <li>anchor.stateSerializer</li>
+                            <li>anchor.utxoManager</li>
+                            <li>anchor.utxoPool</li>
+                            <li>anchor.vrfOperations</li>
+                          </ul>
+                        </li>
+                      </ul>
+                    </div>
+                    <div class="col-lg-4">
+                      <ul class="mb-0 text-light">
+                        <li>
+                          <strong>vrf</strong>
+                          <ul class="text-light">
+                            <li>vrf</li>
+                            <li>vrf.vrfFacade</li>
+                            <li>vrf.core</li>
+                            <li>vrf.core.config</li>
+                            <li>vrf.core.constants</li>
+                            <li>vrf.core.crypto</li>
+                            <li>vrf.core.errors</li>
+                            <li>vrf.core.extractor</li>
+                            <li>vrf.core.folding</li>
+                            <li>vrf.core.logger</li>
+                            <li>vrf.core.nist</li>
+                            <li>vrf.core.nistVerifier</li>
+                            <li>vrf.core.fetcher</li>
+                            <li>vrf.core.fetcher.bitcoin</li>
+                            <li>vrf.core.fetcher.cache</li>
+                            <li>vrf.core.fetcher.index</li>
+                            <li>vrf.core.fetcher.kaspa</li>
+                            <li>vrf.core.fetcher.qrngFetcher</li>
+                            <li>vrf.core.fetcher.qrng</li>
+                            <li>vrf.core.fetcher.utilities</li>
+                            <li>vrf.core.logs</li>
+                            <li>vrf.core.logs.logger</li>
+                            <li>vrf.core.models</li>
+                            <li>vrf.core.models.block</li>
+                            <li>vrf.core.models.vrfProof</li>
+                            <li>vrf.core.tests</li>
+                            <li>vrf.core.tests.basic</li>
+                            <li>vrf.core.tests.binaryMatrixRank</li>
+                            <li>vrf.core.tests.gamma</li>
+                            <li>vrf.core.tests.linearComplexity</li>
+                            <li>vrf.core.tests.maurerUniversal</li>
+                            <li>vrf.core.tests.randomExcursions</li>
+                            <li>vrf.core.tests.spectralDft</li>
+                            <li>vrf.core.tests.templateMatching</li>
+                            <li>vrf.core.tests.utilities</li>
+                            <li>vrf.core.unitTests</li>
+                            <li>vrf.core.unitTests.bitcoinUnitTest</li>
+                            <li>vrf.core.unitTests.cachePersistUnitTest</li>
+                            <li>vrf.core.unitTests.foldingUnitTest</li>
+                            <li>vrf.core.unitTests.kaspaUnitTest</li>
+                            <li>vrf.core.unitTests.qrngUnitTest</li>
+                            <li>vrf.core.unitTests.testDashboard</li>
+                            <li>vrf.core.unitTests.vrfTests</li>
+                          </ul>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item bg-dark border border-secondary-subtle">
+              <h2 class="accordion-header" id="engineExampleNine">
+                <button
+                  class="accordion-button collapsed bg-dark text-light"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#engineExampleNineBody"
+                  aria-expanded="false"
+                  aria-controls="engineExampleNineBody"
+                >
+                  Game engine and audit examples
+                </button>
+              </h2>
+              <div
+                id="engineExampleNineBody"
+                class="accordion-collapse collapse"
+                aria-labelledby="engineExampleNine"
+                data-bs-parent="#engineExamples"
+              >
+                <div class="accordion-body">
+                  <p class="text-muted-soft small mb-3">
+                    Use <strong>KKGameEngine</strong> for provable gameplay,
+                    anchoring, and multiplayer lobbies. It wraps KaspaPortal
+                    plus the KKTP stack.
+                  </p>
+                  <pre class="code-panel rounded-3 p-3 mb-3">
+import { KKGameEngine } from './kktp/kkGameEngine.js';
+
+const game = new KKGameEngine();
+await game.init({
+  password: '1234',
+  walletName: 'demo_wallet',
+  network: 'testnet-10',
+});
+
+await game.startGame({ gameId: 'match-001', playerId: 'player-1' });
+const move = await game.recordMove('jump', { lane: 1 });
+const result = await game.endGame({ score: 42, coins: 3 });
+
+const audit = await game.auditCheating(result.auditData);
+console.log('Audit verdict:', audit.verdict);</pre>
+                  <pre class="code-panel rounded-3 p-3 mb-0">
+const lobby = await game.createLobby({ name: 'Demo Lobby', maxPlayers: 8 });
+await game.sendLobbyMessage('hello lobby');
+console.log('Lobby ID:', lobby.lobbyId);</pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mb-4" id="facades">
+        <div class="bg-surface rounded-4 p-4 p-lg-5">
+          <div
+            class="d-flex flex-column flex-lg-row align-items-start align-items-lg-center justify-content-between gap-3 mb-4"
+          >
+            <div>
+              <h2 class="h3 fw-semibold mb-2">
+                Advanced Facades (kaspaPortal)
+              </h2>
+              <p class="text-muted-soft mb-0">
+                Use <strong>kaspaPortal</strong> when you need low-level control
+                beyond KKGameEngine.
+              </p>
+            </div>
+          </div>
+
+          <div class="accordion" id="facadeExamples">
+            <div class="accordion-item bg-dark border border-secondary-subtle">
+              <h2 class="accordion-header" id="facadeClient">
+                <button
+                  class="accordion-button collapsed bg-dark text-light"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#facadeClientBody"
+                  aria-expanded="false"
+                  aria-controls="facadeClientBody"
+                >
+                  Client facade examples
+                </button>
+              </h2>
+              <div
+                id="facadeClientBody"
+                class="accordion-collapse collapse"
+                aria-labelledby="facadeClient"
+                data-bs-parent="#facadeExamples"
+              >
+                <div class="accordion-body">
+                  <pre class="code-panel rounded-3 p-3 mb-0">
+await kaspaPortal.connect({ networkId: 'testnet-10' });
+
+const info = await kaspaPortal.runRpcCommand({
+  method: 'getInfo',
+  params: [],
+});
+
+console.log(info);</pre
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item bg-dark border border-secondary-subtle">
+              <h2 class="accordion-header" id="facadeWallet">
+                <button
+                  class="accordion-button collapsed bg-dark text-light"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#facadeWalletBody"
+                  aria-expanded="false"
+                  aria-controls="facadeWalletBody"
+                >
+                  Wallet facade examples
+                </button>
+              </h2>
+              <div
+                id="facadeWalletBody"
+                class="accordion-collapse collapse"
+                aria-labelledby="facadeWallet"
+                data-bs-parent="#facadeExamples"
+              >
+                <div class="accordion-body">
+                  <pre class="code-panel rounded-3 p-3 mb-3">
+await kaspaPortal.connect({ networkId: 'testnet-10' });
+
+const wallet = await kaspaPortal.createOrOpenWallet({
+  password: '1234',
+  walletFilename: 'demo_wallet',
+});
+
+const balance = await kaspaPortal.getBalance();
+console.log('Balance:', balance.toString());</pre
+                  >
+                  <pre class="code-panel rounded-3 p-3 mb-3">
+const address = await kaspaPortal.generateNewAddress();
+console.log('New address:', address);</pre
+                  >
+                  <pre class="code-panel rounded-3 p-3 mb-3">
+const wallets = await kaspaPortal.getAllWallets();
+console.log('Wallet files:', wallets);</pre
+                  >
+                  <pre class="code-panel rounded-3 p-3 mb-0">
+await kaspaPortal.send({
+  toAddress: wallet.address,
+  amount: '1',
+  payload: 'payment memo',
+});</pre
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item bg-dark border border-secondary-subtle">
+              <h2 class="accordion-header" id="facadeScanner">
+                <button
+                  class="accordion-button collapsed bg-dark text-light"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#facadeScannerBody"
+                  aria-expanded="false"
+                  aria-controls="facadeScannerBody"
+                >
+                  Scanner facade examples
+                </button>
+              </h2>
+              <div
+                id="facadeScannerBody"
+                class="accordion-collapse collapse"
+                aria-labelledby="facadeScanner"
+                data-bs-parent="#facadeExamples"
+              >
+                <div class="accordion-body">
+                  <pre class="code-panel rounded-3 p-3 mb-3">
+import { kaspaPortal, SearchMode } from './kktp/engine/kaspa/kaspaPortal.js';
+
+await kaspaPortal.connect({ networkId: 'testnet-10' });
+
+kaspaPortal.setScannerPrefix('4b41535041');
+kaspaPortal.setSearchMode(SearchMode.INCLUDES);
+
+await kaspaPortal.startScanner((block) => {
+  console.log('Scanned block:', block.hash);
+});</pre
+                  >
+                  <pre class="code-panel rounded-3 p-3 mb-3">
+kaspaPortal.addPrefix('4b41535041');
+kaspaPortal.removePrefix('4b41535041');
+kaspaPortal.setPrefixes(['4b41535041', '4d59415050']);</pre
+                  >
+                  <pre class="code-panel rounded-3 p-3 mb-0">
+kaspaPortal.addAddress('kaspatest:qq...');
+kaspaPortal.removeAddress('kaspatest:qq...');
+kaspaPortal.setAddresses(['kaspatest:qq...', 'kaspatest:pp...']);</pre
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item bg-dark border border-secondary-subtle">
+              <h2 class="accordion-header" id="facadeIndexer">
+                <button
+                  class="accordion-button collapsed bg-dark text-light"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#facadeIndexerBody"
+                  aria-expanded="false"
+                  aria-controls="facadeIndexerBody"
+                >
+                  Indexer facade examples
+                </button>
+              </h2>
+              <div
+                id="facadeIndexerBody"
+                class="accordion-collapse collapse"
+                aria-labelledby="facadeIndexer"
+                data-bs-parent="#facadeExamples"
+              >
+                <div class="accordion-body">
+                  <p class="text-muted-soft small mb-3">
+                    Note: You can also retrieve full blocks from the indexer
+                    caches (not just transactions). This dual path is
+                    intentional to support block-level analytics and payload
+                    matching.
+                  </p>
+                  <pre class="code-panel rounded-3 p-3 mb-3">
+await kaspaPortal.connect({ networkId: 'testnet-10' });
+
+await kaspaPortal.startIndexer();
+const cached = await kaspaPortal.getAllCachedMatchingTransactions();
+console.log('Cached matches:', cached.length);</pre
+                  >
+                  <pre class="code-panel rounded-3 p-3 mb-3">
+const inMemory = kaspaPortal.getInMemorySnapshot();
+const cachedSnapshot = await kaspaPortal.getCachedSnapshot();
+
+console.log('In-memory blocks:', inMemory?.blocks?.length || 0);
+console.log('Cached blocks:', cachedSnapshot?.blocks?.length || 0);</pre
+                  >
+                  <pre class="code-panel rounded-3 p-3 mb-3">
+await kaspaPortal.walkDagRange({
+  startHash: '0000...startHash',
+  prefixes: ['4b41535041'],
+  maxSeconds: 30,
+  minTimestamp: 0,
+  onMatch: (tx, block) => {
+    console.log('Match:', tx?.txid || tx?.transactionId, block?.hash);
+  },
+});</pre
+                  >
+                  <pre class="code-panel rounded-3 p-3 mb-3">
+const block = await kaspaPortal.fetchBlockByHash('0000...blockHash');
+console.log('Block tx count:', block?.transactions?.length || 0);</pre
+                  >
+                  <pre class="code-panel rounded-3 p-3 mb-0">
+kaspaPortal
+  .onNewBlock((block) => console.log('New block:', block.hash))
+  .onNewTransaction((tx) => console.log('New tx:', tx.id))
+  .onNewTransactionMatch((match) => console.log('Match:', match))
+  .onCachedBlock((block) => console.log('Cached block:', block.hash))
+  .onCachedTransaction((tx) => console.log('Cached tx:', tx.id))
+  .onCachedTransactionMatch((match) => console.log('Cached match:', match))
+  .onEvict((eviction) => console.log('Evict:', eviction))
+  .onCacheEvict((eviction) => console.log('Cache evict:', eviction));</pre
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item bg-dark border border-secondary-subtle">
+              <h2 class="accordion-header" id="facadeCrypto">
+                <button
+                  class="accordion-button collapsed bg-dark text-light"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#facadeCryptoBody"
+                  aria-expanded="false"
+                  aria-controls="facadeCryptoBody"
+                >
+                  Crypto facade examples
+                </button>
+              </h2>
+              <div
+                id="facadeCryptoBody"
+                class="accordion-collapse collapse"
+                aria-labelledby="facadeCrypto"
+                data-bs-parent="#facadeExamples"
+              >
+                <div class="accordion-body">
+                  <pre class="code-panel rounded-3 p-3 mb-3">
+const encrypted = await kaspaPortal.encrypt('hello', 'passphrase');
+const decrypted = await kaspaPortal.decrypt(encrypted, 'passphrase');
+
+console.log({ encrypted, decrypted });</pre
+                  >
+                  <pre class="code-panel rounded-3 p-3 mb-3">
+await kaspaPortal.connect({ networkId: 'testnet-10' });
+await kaspaPortal.createOrOpenWallet({ password: '1234', walletFilename: 'demo_wallet' });
+
+const keys = await kaspaPortal.generateIdentityKeys(0);
+console.log('Signing pub:', keys.sig.publicKey);
+console.log('DH pub:', keys.dh.publicKey);</pre
+                  >
+                  <pre class="code-panel rounded-3 p-3 mb-3">
+const session = await kaspaPortal.startSession(1);
+const ack = await session.respondToHandshake(peerPublicKeyHex);
+const encryptedMsg = session.encryptMessage('hello');
+console.log('Handshake ack:', ack, encryptedMsg);</pre
+                  >
+                  <pre class="code-panel rounded-3 p-3 mb-0">
+const message = 'hello-signed';
+const signature = await kaspaPortal.signMessage(keys.sig.privateKey, message);
+const isValid = await kaspaPortal.verifyMessage(keys.sig.publicKey, message, signature);
+
+console.log('Valid signature:', isValid);</pre
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item bg-dark border border-secondary-subtle">
+              <h2 class="accordion-header" id="facadeVrf">
+                <button
+                  class="accordion-button collapsed bg-dark text-light"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#facadeVrfBody"
+                  aria-expanded="false"
+                  aria-controls="facadeVrfBody"
+                >
+                  VRF facade examples
+                </button>
+              </h2>
+              <div
+                id="facadeVrfBody"
+                class="accordion-collapse collapse"
+                aria-labelledby="facadeVrf"
+                data-bs-parent="#facadeExamples"
+              >
+                <div class="accordion-body">
+                  <pre class="code-panel rounded-3 p-3 mb-3">
+const proof = await kaspaPortal.prove({
+  seedInput: 'my-seed',
+  btcBlocks: 1,
+  kasBlocks: 1,
+  iterations: 2,
+});
+
+const isValid = await kaspaPortal.verify(proof);
+console.log('VRF valid:', isValid);</pre
+                  >
+                  <pre class="code-panel rounded-3 p-3 mb-3">
+const btcBlocks = await kaspaPortal.getBitcoinBlocks(2);
+const kasBlocks = await kaspaPortal.getKaspaBlocks(2);
+const qrng = await kaspaPortal.getQRNG('nist', 32);
+
+console.log({ btcBlocks, kasBlocks, qrng });</pre
+                  >
+                  <pre class="code-panel rounded-3 p-3 mb-3">
+const folded = await kaspaPortal.fold('aa11', 'bb22', { iterations: 2 });
+console.log('Folded:', folded);</pre
+                  >
+                  <pre class="code-panel rounded-3 p-3 mb-3">
+const full = await kaspaPortal.fullNIST('0101010101');
+const basic = await kaspaPortal.basicNIST('0101010101');
+console.log({ full, basic });</pre
+                  >
+                  <pre class="code-panel rounded-3 p-3 mb-0">
+const fullRand = await kaspaPortal.generateFullRandomness();
+const partialRand = await kaspaPortal.generatePartialRandomness();
+console.log({ fullRand, partialRand });</pre
+                  >
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

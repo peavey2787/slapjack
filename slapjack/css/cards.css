@@ -1,0 +1,128 @@
+/* ═══════════════════════════════════════════════════════════
+   cards.css — Playing card visuals
+   ═══════════════════════════════════════════════════════════ */
+
+.card {
+  --card-w: 100px;
+  --card-h: 140px;
+  width: var(--card-w);
+  height: var(--card-h);
+  border-radius: var(--radius-md);
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform var(--dur-base) var(--ease-out);
+  flex-shrink: 0;
+}
+
+.card-face {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-md);
+  backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  border: 2px solid rgba(255,255,255,.12);
+  box-shadow: 0 4px 16px rgba(0,0,0,.4);
+}
+
+/* Front face */
+.card-front {
+  background: #fff;
+  color: var(--black-suit);
+}
+.card-front.red { color: var(--red-suit); }
+
+.card-rank {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+.card-suit {
+  font-size: 1.8rem;
+  line-height: 1;
+  margin-top: 2px;
+}
+.card-corner {
+  position: absolute;
+  font-size: .65rem;
+  line-height: 1.1;
+  text-align: center;
+}
+.card-corner.top-left {
+  top: 5px;
+  left: 6px;
+}
+.card-corner.bottom-right {
+  bottom: 5px;
+  right: 6px;
+  transform: rotate(180deg);
+}
+
+/* Back face */
+.card-back {
+  background: linear-gradient(135deg, #1a5276 0%, #154360 50%, #0e2f44 100%);
+  transform: rotateY(180deg);
+  overflow: hidden;
+}
+.card-back::after {
+  content: '♠';
+  font-size: 3rem;
+  opacity: .12;
+  color: #fff;
+}
+
+/* Card flip states */
+.card.face-down { transform: rotateY(180deg); }
+.card.face-up   { transform: rotateY(0deg); }
+
+/* Pile card positioning */
+.pile-card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.pile-card.face-up {
+  transform: translate(-50%, -50%) rotateY(0deg);
+}
+
+.pile-card.dealing {
+  animation: dealCard var(--dur-base) var(--ease-out) forwards;
+}
+
+/* Card sizes */
+.card.card-lg {
+  --card-w: 130px;
+  --card-h: 182px;
+}
+.card.card-lg .card-rank { font-size: 2.2rem; }
+.card.card-lg .card-suit { font-size: 2.4rem; }
+.card.card-lg .card-corner { font-size: .8rem; }
+
+/* Deck stack effect */
+.deck-stack {
+  position: relative;
+  width: var(--card-w, 100px);
+  height: var(--card-h, 140px);
+}
+.deck-stack .card {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.deck-stack .card:nth-child(2) { top: -2px; left: 1px; }
+.deck-stack .card:nth-child(3) { top: -4px; left: 2px; }
+
+/* Jack highlight */
+.card.is-jack .card-front {
+  box-shadow: 0 0 20px var(--gold-glow), 0 0 40px var(--gold-glow);
+  border-color: var(--gold);
+}
+
+/* Card won animation */
+.card.won {
+  animation: cardWon var(--dur-slow) var(--ease-out);
+}

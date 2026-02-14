@@ -1,0 +1,49 @@
+{
+  "type": "object",
+
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": ["session_end"],
+      "required": true
+    },
+
+    "version": {
+      "type": "number",
+      "required": true
+    },
+
+    "sid": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{32,}$",
+      "required": true
+    },
+
+    "pub_sig": {
+      "type": "string",
+      "pattern": "^[0-9a-f]+$",
+      "required": true
+    },
+
+    "reason": {
+      "type": "string",
+      "required": true
+    },
+
+    "sig": {
+      "type": "string",
+      "pattern": "^[0-9a-f]+$"
+    }
+  },
+
+  "required": [
+    "type",
+    "version",
+    "sid",
+    "pub_sig",
+    "reason",
+    "sig"
+  ],
+
+  "additionalProperties": false
+}
