@@ -160,4 +160,6 @@ This project demonstrates how to keep game logic/UI clean while delegating block
 - lobby/session messaging,
 - wallet and balance visibility.
 
-It is a concise reference implementation for integrating a real-time browser game with the engine facade in `kktp/`.
+It is a concise reference implementation for integrating a real-time browser game with the engine's SDK in `kktp/`.
+
+**Note** This version of the game engine may be slightly different than the latest version as I was attempting to speed up the lobby creation/joining process.
